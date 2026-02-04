@@ -1,0 +1,165 @@
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Search, ShoppingCart, User, Menu, X, Phone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+
+const navigation = [
+  { name: "Canetas Emagrecedoras", href: "/loja?categoria=canetas-emagrecedoras" },
+  { name: "Vitaminas", href: "/loja?categoria=vitaminas" },
+  { name: "Suplementos", href: "/loja?categoria=suplementos" },
+  { name: "Promoções", href: "/loja?promocoes=true" },
+];
+
+export function Header() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const location = useLocation();
+  const cartItemCount = 0; // Mock - will be replaced with real cart state
+
+  return (
+    <header className="sticky top-0 z-50 w-full">
+      {/* Top bar */}
+      <div className="gradient-hero">
+        <div className="container-custom flex h-10 items-center justify-between text-sm text-white">
+          <span className="hidden sm:inline">Importados para seu bem-estar!</span>
+          <div className="flex items-center gap-4 ml-auto">
+            <Link to="/conta" className="hover:underline transition-colors">
+              Minha conta
+            </Link>
+            <span className="hidden sm:inline">|</span>
+            <Link to="/contato" className="hover:underline transition-colors">
+              Contato
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Main header */}
+      <div className="bg-background border-b border-border shadow-sm">
+        <div className="container-custom flex h-20 items-center justify-between gap-4">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 shrink-0">
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold text-highlight">Lipo</span>
+              <span className="text-xs text-muted-foreground -mt-1">Imports</span>
+            </div>
+          </Link>
+
+          {/* Search bar - desktop */}
+          <div className="hidden md:flex flex-1 max-w-xl mx-8">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Pesquisar produtos..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-4 h-11 rounded-full border-2 border-border focus:border-primary"
+              />
+            </div>
+          </div>
+
+          {/* Right side actions */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Cart */}
+            <Link to="/carrinho" className="relative">
+              <Button variant="ghost" size="icon" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-highlight text-highlight-foreground text-xs flex items-center justify-center font-semibold">
+                    {cartItemCount}
+                  </span>
+                )}
+              </Button>
+              <span className="hidden sm:block text-sm font-medium">R$0,00</span>
+            </Link>
+
+            {/* Mobile menu button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+        </div>
+
+        {/* Navigation - desktop */}
+        <nav className="hidden md:block bg-highlight">
+          <div className="container-custom">
+            <ul className="flex items-center justify-center gap-1">
+              {navigation.map((item) => (
+                <li key={item.name}>
+                  <Link
+                    to={item.href}
+                    className={cn(
+                      "block px-4 py-3 text-sm font-medium text-highlight-foreground hover:bg-white/10 transition-colors",
+                      location.pathname + location.search === item.href && "bg-white/20"
+                    )}
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+              <li className="ml-auto flex items-center gap-2 text-highlight-foreground text-sm">
+                <Phone className="h-4 w-4" />
+                <span>Compre pelo WhatsApp: (83) 99339-6445</span>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+
+      {/* Mobile menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-background border-b border-border animate-slide-up">
+          {/* Mobile search */}
+          <div className="p-4 border-b border-border">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Pesquisar produtos..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-4 h-11 rounded-full"
+              />
+            </div>
+          </div>
+
+          {/* Mobile navigation */}
+          <nav className="p-4">
+            <ul className="space-y-1">
+              {navigation.map((item) => (
+                <li key={item.name}>
+                  <Link
+                    to={item.href}
+                    className="block px-4 py-3 text-sm font-medium rounded-lg hover:bg-muted transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+              <li className="pt-4 border-t border-border mt-4">
+                <a
+                  href="https://wa.me/5583993396445"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-accent rounded-lg hover:bg-accent/10 transition-colors"
+                >
+                  <Phone className="h-4 w-4" />
+                  <span>WhatsApp: (83) 99339-6445</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      )}
+    </header>
+  );
+}

@@ -20,21 +20,21 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent/10 hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         highlight:
-          "bg-highlight text-highlight-foreground hover:bg-highlight/90 shadow-md hover:shadow-lg active:scale-[0.98]",
+          "bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg active:scale-[0.98]",
         success:
           "bg-accent text-accent-foreground hover:bg-accent/90 active:scale-[0.98]",
         "outline-highlight":
-          "border-2 border-highlight bg-transparent text-highlight hover:bg-highlight hover:text-highlight-foreground",
+          "border-2 border-accent bg-transparent text-accent hover:bg-accent hover:text-accent-foreground",
         "outline-success":
           "border-2 border-accent bg-transparent text-accent hover:bg-accent hover:text-accent-foreground",
         hero:
-          "bg-white text-highlight font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]",
+          "bg-white text-primary font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]",
         wishlist:
-          "bg-highlight text-highlight-foreground hover:bg-highlight/90 text-xs",
+          "border border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground text-xs",
         cart:
           "bg-primary text-primary-foreground hover:bg-primary/90 text-xs",
         quickview:
-          "bg-highlight text-highlight-foreground hover:bg-highlight/90 text-xs",
+          "bg-accent text-accent-foreground hover:bg-accent/90 text-xs",
       },
       size: {
         default: "h-10 px-5 py-2",

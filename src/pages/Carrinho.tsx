@@ -12,7 +12,6 @@ interface CartItem {
 }
 
 const Carrinho = () => {
-  // Mock cart items - would come from global state/context in real app
   const [cartItems, setCartItems] = useState<CartItem[]>([
     { productId: "1", quantity: 1 },
     { productId: "2", quantity: 2 },
@@ -44,7 +43,7 @@ const Carrinho = () => {
 
   return (
     <Layout>
-      <div className="bg-muted py-8">
+      <div className="bg-secondary py-8">
         <div className="container-custom">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground">
             Carrinho de Compras
@@ -80,7 +79,7 @@ const Carrinho = () => {
                     {/* Product image */}
                     <Link
                       to={`/produto/${product.slug}`}
-                      className="w-24 h-24 bg-muted rounded-lg shrink-0 overflow-hidden"
+                      className="w-24 h-24 bg-secondary rounded-lg shrink-0 overflow-hidden"
                     >
                       <img
                         src={product.images[0]}
@@ -97,7 +96,7 @@ const Carrinho = () => {
                       >
                         {product.name}
                       </Link>
-                      <p className="text-highlight font-bold mt-1">
+                      <p className="text-primary font-bold mt-1">
                         {formatPrice(product.price)}
                       </p>
 
@@ -162,7 +161,7 @@ const Carrinho = () => {
 
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span className="text-highlight">{formatPrice(subtotal)}</span>
+                  <span className="text-primary">{formatPrice(subtotal)}</span>
                 </div>
 
                 {/* Coupon */}
@@ -174,7 +173,7 @@ const Carrinho = () => {
                   </div>
                 </div>
 
-                <Button variant="highlight" size="lg" className="w-full mt-6">
+                <Button variant="success" size="lg" className="w-full mt-6">
                   Finalizar Compra
                   <ArrowRight className="h-4 w-4" />
                 </Button>

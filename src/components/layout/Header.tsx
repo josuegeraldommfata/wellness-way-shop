@@ -16,13 +16,13 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
-  const cartItemCount = 0; // Mock - will be replaced with real cart state
+  const cartItemCount = 0;
 
   return (
     <header className="sticky top-0 z-50 w-full">
-      {/* Top bar */}
-      <div className="gradient-hero">
-        <div className="container-custom flex h-10 items-center justify-between text-sm text-white">
+      {/* Top bar - Azul */}
+      <div className="bg-primary">
+        <div className="container-custom flex h-10 items-center justify-between text-sm text-primary-foreground">
           <span className="hidden sm:inline">Importados para seu bem-estar!</span>
           <div className="flex items-center gap-4 ml-auto">
             <Link to="/conta" className="hover:underline transition-colors">
@@ -42,7 +42,7 @@ export function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <div className="flex flex-col">
-              <span className="text-2xl font-bold text-highlight">Lipo</span>
+              <span className="text-2xl font-bold text-primary">Lipo</span>
               <span className="text-xs text-muted-foreground -mt-1">Imports</span>
             </div>
           </Link>
@@ -64,11 +64,11 @@ export function Header() {
           {/* Right side actions */}
           <div className="flex items-center gap-2 sm:gap-4">
             {/* Cart */}
-            <Link to="/carrinho" className="relative">
+            <Link to="/carrinho" className="relative flex items-center gap-2">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
                 {cartItemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-highlight text-highlight-foreground text-xs flex items-center justify-center font-semibold">
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center font-semibold">
                     {cartItemCount}
                   </span>
                 )}
@@ -89,7 +89,7 @@ export function Header() {
         </div>
 
         {/* Navigation - desktop */}
-        <nav className="hidden md:block bg-highlight">
+        <nav className="hidden md:block bg-primary">
           <div className="container-custom">
             <ul className="flex items-center justify-center gap-1">
               {navigation.map((item) => (
@@ -97,7 +97,7 @@ export function Header() {
                   <Link
                     to={item.href}
                     className={cn(
-                      "block px-4 py-3 text-sm font-medium text-highlight-foreground hover:bg-white/10 transition-colors",
+                      "block px-4 py-3 text-sm font-medium text-primary-foreground hover:bg-white/10 transition-colors",
                       location.pathname + location.search === item.href && "bg-white/20"
                     )}
                   >
@@ -105,7 +105,7 @@ export function Header() {
                   </Link>
                 </li>
               ))}
-              <li className="ml-auto flex items-center gap-2 text-highlight-foreground text-sm">
+              <li className="ml-auto flex items-center gap-2 text-primary-foreground text-sm">
                 <Phone className="h-4 w-4" />
                 <span>Compre pelo WhatsApp: (83) 99339-6445</span>
               </li>

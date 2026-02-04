@@ -6,7 +6,7 @@ import heroBanner from "@/assets/hero-banner.jpg";
 export function HeroSection() {
   return (
     <section className="relative min-h-[500px] md:min-h-[600px] overflow-hidden">
-      {/* Background gradient */}
+      {/* Background gradient - Azul */}
       <div className="absolute inset-0 gradient-hero" />
       
       {/* Background image */}
@@ -16,7 +16,7 @@ export function HeroSection() {
           alt="Saúde e bem-estar"
           className="w-full h-full object-cover object-right opacity-90"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(340,75%,55%)/0.85] via-[hsl(340,75%,55%)/0.6] to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/70 to-transparent" />
       </div>
 
       {/* Content */}
@@ -31,9 +31,9 @@ export function HeroSection() {
             Produtos importados, originais e com entrega rápida para transformar sua rotina.
           </p>
           <Button
-            variant="hero"
+            variant="success"
             size="xl"
-            className="mt-8"
+            className="mt-8 shadow-lg hover:shadow-xl"
             asChild
           >
             <Link to="/loja">

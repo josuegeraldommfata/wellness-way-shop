@@ -9,7 +9,7 @@ export function BestSellers() {
     <section className="py-16 bg-background">
       <div className="container-custom">
         <div className="text-center mb-10">
-          <Badge variant="outline" className="mb-4 text-highlight border-highlight">
+          <Badge variant="outline" className="mb-4 text-primary border-primary">
             MAIS VENDIDOS
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground">

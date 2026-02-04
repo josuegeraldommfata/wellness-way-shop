@@ -30,7 +30,7 @@ const Produto = () => {
   return (
     <Layout>
       {/* Breadcrumb */}
-      <div className="bg-muted py-4">
+      <div className="bg-secondary py-4">
         <div className="container-custom">
           <Link
             to="/loja"
@@ -46,7 +46,7 @@ const Produto = () => {
       <div className="container-custom py-8 md:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Product image */}
-          <div className="aspect-square bg-muted rounded-2xl overflow-hidden">
+          <div className="aspect-square bg-secondary rounded-2xl overflow-hidden">
             <img
               src={product.images[0]}
               alt={product.name}
@@ -57,7 +57,7 @@ const Produto = () => {
           {/* Product info */}
           <div className="flex flex-col">
             {product.isBestSeller && (
-              <Badge className="w-fit mb-4 bg-highlight text-highlight-foreground">
+              <Badge className="w-fit mb-4 bg-accent text-accent-foreground">
                 Mais Vendido
               </Badge>
             )}
@@ -69,8 +69,8 @@ const Produto = () => {
             <p className="text-muted-foreground mt-2">{product.brand}</p>
 
             {/* Price */}
-            <div className="mt-6 p-6 bg-muted rounded-xl">
-              <p className="text-3xl font-bold text-highlight">
+            <div className="mt-6 p-6 bg-secondary rounded-xl">
+              <p className="text-3xl font-bold text-primary">
                 {formatPrice(product.price)}
               </p>
               <p className="text-accent mt-2 font-medium">
@@ -102,11 +102,11 @@ const Produto = () => {
 
             {/* Actions */}
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <Button variant="highlight" size="lg" className="flex-1">
+              <Button variant="default" size="lg" className="flex-1">
                 <ShoppingCart className="h-5 w-5" />
                 Adicionar ao Carrinho
               </Button>
-              <Button variant="outline-highlight" size="lg">
+              <Button variant="outline" size="lg">
                 <Heart className="h-5 w-5" />
               </Button>
             </div>

@@ -3,10 +3,10 @@ import { Badge } from "@/components/ui/badge";
 
 export function TestimonialsSection() {
   return (
-    <section className="py-16 bg-muted">
+    <section className="py-16 bg-secondary">
       <div className="container-custom">
         <div className="text-center mb-10">
-          <Badge variant="outline" className="mb-4 text-highlight border-highlight">
+          <Badge variant="outline" className="mb-4 text-primary border-primary">
             RECEBIDOS
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground">
@@ -19,7 +19,7 @@ export function TestimonialsSection() {
           {testimonials.slice(0, 3).map((testimonial) => (
             <div
               key={testimonial.id}
-              className="gradient-hero rounded-xl p-6 text-white"
+              className="bg-primary rounded-xl p-6 text-primary-foreground"
             >
               <p className="text-sm md:text-base leading-relaxed">
                 {testimonial.content}

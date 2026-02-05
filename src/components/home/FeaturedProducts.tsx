@@ -1,7 +1,8 @@
-import { products } from "@/data/mockData";
+import { useStoreData } from "@/contexts/StoreDataContext";
 import { ProductCard } from "@/components/products/ProductCard";
 
 export function FeaturedProducts() {
+  const { products } = useStoreData();
   const featuredProducts = products.filter((p) => p.isFeatured);
 
   return (

@@ -1,8 +1,9 @@
-import { products } from "@/data/mockData";
+import { useStoreData } from "@/contexts/StoreDataContext";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Badge } from "@/components/ui/badge";
 
 export function BestSellers() {
+  const { products } = useStoreData();
   const bestSellers = products.filter((p) => p.isBestSeller);
 
   return (

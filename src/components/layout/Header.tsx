@@ -4,34 +4,47 @@ import { Search, ShoppingCart, User, Menu, X, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-
-const navigation = [
-  { name: "Canetas Emagrecedoras", href: "/loja?categoria=canetas-emagrecedoras" },
-  { name: "Vitaminas", href: "/loja?categoria=vitaminas" },
-  { name: "Suplementos", href: "/loja?categoria=suplementos" },
-  { name: "Promoções", href: "/loja?promocoes=true" },
-];
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
+  const { settings } = useSiteSettings();
+  const { isAuthenticated, isAdmin, user } = useAuth();
   const cartItemCount = 0;
 
   return (
     <header className="sticky top-0 z-50 w-full">
-      {/* Top bar - Azul */}
+      {/* Top bar */}
       <div className="bg-primary">
         <div className="container-custom flex h-10 items-center justify-between text-sm text-primary-foreground">
-          <span className="hidden sm:inline">Importados para seu bem-estar!</span>
+          <span className="hidden sm:inline">{settings.topBarText}</span>
           <div className="flex items-center gap-4 ml-auto">
-            <Link to="/conta" className="hover:underline transition-colors">
-              Minha conta
-            </Link>
-            <span className="hidden sm:inline">|</span>
-            <Link to="/contato" className="hover:underline transition-colors">
-              Contato
-            </Link>
+            {isAuthenticated ? (
+              <>
+                {isAdmin && (
+                  <Link to="/admin" className="hover:underline transition-colors">
+                    Admin
+                  </Link>
+                )}
+                <span className="hidden sm:inline">|</span>
+                <Link to="/conta" className="hover:underline transition-colors">
+                  Olá, {user?.name.split(" ")[0]}
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="hover:underline transition-colors">
+                  Entrar
+                </Link>
+                <span className="hidden sm:inline">|</span>
+                <Link to="/cadastro" className="hover:underline transition-colors">
+                  Cadastrar
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -41,10 +54,16 @@ export function Header() {
         <div className="container-custom flex h-20 items-center justify-between gap-4">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 shrink-0">
-            <div className="flex flex-col">
-              <span className="text-2xl font-bold text-primary">Lipo</span>
-              <span className="text-xs text-muted-foreground -mt-1">Imports</span>
-            </div>
+            {settings.logoUrl ? (
+              <img src={settings.logoUrl} alt={settings.siteName} className="h-12" />
+            ) : (
+              <div className="flex flex-col">
+                <span className="text-2xl font-bold text-primary">
+                  {settings.siteName.split("Imports")[0] || "Lipo"}
+                </span>
+                <span className="text-xs text-muted-foreground -mt-1">Imports</span>
+              </div>
+            )}
           </Link>
 
           {/* Search bar - desktop */}
@@ -92,7 +111,7 @@ export function Header() {
         <nav className="hidden md:block bg-primary">
           <div className="container-custom">
             <ul className="flex items-center justify-center gap-1">
-              {navigation.map((item) => (
+              {settings.navbarLinks.map((item) => (
                 <li key={item.name}>
                   <Link
                     to={item.href}
@@ -107,7 +126,7 @@ export function Header() {
               ))}
               <li className="ml-auto flex items-center gap-2 text-primary-foreground text-sm">
                 <Phone className="h-4 w-4" />
-                <span>Compre pelo WhatsApp: (83) 99339-6445</span>
+                <span>Compre pelo WhatsApp: {settings.footerPhone}</span>
               </li>
             </ul>
           </div>
@@ -134,7 +153,7 @@ export function Header() {
           {/* Mobile navigation */}
           <nav className="p-4">
             <ul className="space-y-1">
-              {navigation.map((item) => (
+              {settings.navbarLinks.map((item) => (
                 <li key={item.name}>
                   <Link
                     to={item.href}
@@ -145,15 +164,26 @@ export function Header() {
                   </Link>
                 </li>
               ))}
+              {isAdmin && (
+                <li>
+                  <Link
+                    to="/admin"
+                    className="block px-4 py-3 text-sm font-medium rounded-lg hover:bg-muted transition-colors text-primary"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Painel Admin
+                  </Link>
+                </li>
+              )}
               <li className="pt-4 border-t border-border mt-4">
                 <a
-                  href="https://wa.me/5583993396445"
+                  href={`https://wa.me/55${settings.footerPhone.replace(/\D/g, "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-accent rounded-lg hover:bg-accent/10 transition-colors"
                 >
                   <Phone className="h-4 w-4" />
-                  <span>WhatsApp: (83) 99339-6445</span>
+                  <span>WhatsApp: {settings.footerPhone}</span>
                 </a>
               </li>
             </ul>

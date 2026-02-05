@@ -1,7 +1,12 @@
 import { Link } from "react-router-dom";
 import { Instagram, Phone, Mail } from "lucide-react";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
 export function Footer() {
+  const { settings } = useSiteSettings();
+
+  const phoneNumber = settings.footerPhone.replace(/\D/g, "");
+
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container-custom py-12">
@@ -10,12 +15,11 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-bold mb-4">Sobre nós</h3>
             <p className="text-sm opacity-90 leading-relaxed">
-              A LipoImports oferece produtos importados de qualidade para auxiliar no emagrecimento, 
-              com preço justo e entrega rápida em todo o Brasil.
+              {settings.footerAboutText}
             </p>
             <div className="flex gap-3 mt-4">
               <a
-                href="https://instagram.com"
+                href={settings.footerInstagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
@@ -85,12 +89,12 @@ export function Footer() {
                 <div>
                   <p className="font-medium">WhatsApp:</p>
                   <a
-                    href="https://wa.me/5583993396445"
+                    href={`https://wa.me/55${phoneNumber}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="opacity-90 hover:opacity-100 hover:underline"
                   >
-                    (83) 99339-6445
+                    {settings.footerPhone}
                   </a>
                 </div>
               </li>
@@ -101,10 +105,10 @@ export function Footer() {
                 <div>
                   <p className="font-medium">Email:</p>
                   <a
-                    href="mailto:contato@lipoimports.com.br"
+                    href={`mailto:${settings.footerEmail}`}
                     className="opacity-90 hover:opacity-100 hover:underline"
                   >
-                    contato@lipoimports.com.br
+                    {settings.footerEmail}
                   </a>
                 </div>
               </li>
@@ -116,7 +120,7 @@ export function Footer() {
       {/* Copyright */}
       <div className="border-t border-white/20">
         <div className="container-custom py-4 text-center text-sm opacity-80">
-          Copyright © 2025 – LipoImports. All Rights Reserved.
+          Copyright © 2025 – {settings.siteName}. All Rights Reserved.
         </div>
       </div>
     </footer>

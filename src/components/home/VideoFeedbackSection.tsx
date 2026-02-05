@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { Play } from "lucide-react";
-import { videoTestimonials } from "@/data/mockData";
+import { useStoreData } from "@/contexts/StoreDataContext";
 import { Badge } from "@/components/ui/badge";
 
 export function VideoFeedbackSection() {
+  const { videoTestimonials } = useStoreData();
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+
+  if (videoTestimonials.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-16 bg-primary">
@@ -70,7 +75,7 @@ export function VideoFeedbackSection() {
                 Clique para fechar.
               </p>
               <p className="text-sm text-primary">
-                Dica: Substitua as URLs no arquivo mockData.ts pelos links dos seus vídeos.
+                Dica: Adicione vídeos no painel admin em Vídeos.
               </p>
             </div>
           </div>

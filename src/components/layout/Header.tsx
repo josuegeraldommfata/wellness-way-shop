@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
+import { formatPrice } from "@/data/mockData";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -13,7 +15,7 @@ export function Header() {
   const location = useLocation();
   const { settings } = useSiteSettings();
   const { isAuthenticated, isAdmin, user } = useAuth();
-  const cartItemCount = 0;
+  const { totalItems, subtotal } = useCart();
 
   return (
     <header className="sticky top-0 z-50 w-full">
@@ -86,13 +88,13 @@ export function Header() {
             <Link to="/carrinho" className="relative flex items-center gap-2">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
-                {cartItemCount > 0 && (
+                {totalItems > 0 && (
                   <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center font-semibold">
-                    {cartItemCount}
+                    {totalItems}
                   </span>
                 )}
               </Button>
-              <span className="hidden sm:block text-sm font-medium">R$0,00</span>
+              <span className="hidden sm:block text-sm font-medium">{formatPrice(subtotal)}</span>
             </Link>
 
             {/* Mobile menu button */}

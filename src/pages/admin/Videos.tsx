@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 import {
   Dialog,
   DialogContent,
@@ -79,7 +80,7 @@ export default function AdminVideos() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Vídeos de Feedback</h1>
             <p className="text-muted-foreground">
@@ -98,7 +99,7 @@ export default function AdminVideos() {
             <Card key={video.id} className="overflow-hidden">
               <div className="relative aspect-video bg-muted">
                 <img
-                  src={video.thumbnailUrl}
+                  src={video.thumbnailUrl || "/placeholder.svg"}
                   alt={video.title}
                   className="w-full h-full object-cover"
                 />
@@ -108,7 +109,7 @@ export default function AdminVideos() {
                   </div>
                 </div>
                 <span className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                  {video.duration}
+                  {video.duration || "0:00"}
                 </span>
               </div>
               <CardContent className="p-4">
@@ -155,13 +156,23 @@ export default function AdminVideos() {
 
         {/* Video Dialog */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent>
+          <DialogContent className="max-w-lg">
             <DialogHeader>
               <DialogTitle>
                 {editingVideo ? "Editar Vídeo" : "Novo Vídeo"}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Thumbnail (imagem de capa) *</Label>
+                <ImageUpload
+                  value={form.thumbnailUrl}
+                  onChange={(v) => setForm((p) => ({ ...p, thumbnailUrl: v }))}
+                  aspectRatio="banner"
+                  placeholder="Adicionar imagem de capa do vídeo"
+                />
+              </div>
+
               <div className="space-y-2">
                 <Label>Título *</Label>
                 <Input
@@ -180,34 +191,26 @@ export default function AdminVideos() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label>URL da Thumbnail *</Label>
-                <Input
-                  value={form.thumbnailUrl}
-                  onChange={(e) => setForm((p) => ({ ...p, thumbnailUrl: e.target.value }))}
-                  placeholder="https://..."
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>URL do Vídeo (YouTube/Vimeo)</Label>
+                  <Input
+                    value={form.videoUrl}
+                    onChange={(e) => setForm((p) => ({ ...p, videoUrl: e.target.value }))}
+                    placeholder="https://youtube.com/..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Duração</Label>
+                  <Input
+                    value={form.duration}
+                    onChange={(e) => setForm((p) => ({ ...p, duration: e.target.value }))}
+                    placeholder="0:45"
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>URL do Vídeo</Label>
-                <Input
-                  value={form.videoUrl}
-                  onChange={(e) => setForm((p) => ({ ...p, videoUrl: e.target.value }))}
-                  placeholder="https://..."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Duração</Label>
-                <Input
-                  value={form.duration}
-                  onChange={(e) => setForm((p) => ({ ...p, duration: e.target.value }))}
-                  placeholder="0:45"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-4">
+              <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button variant="outline" onClick={() => setDialogOpen(false)}>
                   Cancelar
                 </Button>

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import { products as initialProducts, categories as initialCategories, videoTestimonials as initialVideos, Product, Category, VideoTestimonial } from "@/data/mockData";
+import { products as initialProducts, categories as initialCategories, videoTestimonials as initialVideos, Product, Category, VideoTestimonial, Banner } from "@/data/mockData";
 
 export interface SubCategory {
   id: string;
@@ -79,6 +79,13 @@ interface StoreDataContextType {
   // Shipping
   shippingIntegrations: ShippingIntegration[];
   updateShippingIntegration: (id: string, config: Partial<ShippingIntegration>) => void;
+  
+  // Banners
+  banners: Banner[];
+  addBanner: (banner: Omit<Banner, "id" | "order">) => void;
+  updateBanner: (id: string, banner: Partial<Banner>) => void;
+  deleteBanner: (id: string) => void;
+  reorderBanners: (orderedIds: string[]) => void;
 }
 
 const StoreDataContext = createContext<StoreDataContextType | undefined>(undefined);
@@ -185,6 +192,20 @@ const defaultShippingIntegrations: ShippingIntegration[] = [
   },
 ];
 
+// Default banners
+const defaultBanners: Banner[] = [
+  {
+    id: "banner-1",
+    title: "EMAGREÇA COM QUALIDADE E SEGURANÇA",
+    subtitle: "Produtos importados, originais e com entrega rápida para transformar sua rotina.",
+    buttonText: "COMPRAR AGORA",
+    buttonLink: "/loja",
+    image: "",
+    isActive: true,
+    order: 1,
+  },
+];
+
 export function StoreDataProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>(() => {
     const stored = localStorage.getItem("lipoimports_products");
@@ -219,6 +240,11 @@ export function StoreDataProvider({ children }: { children: ReactNode }) {
   const [shippingIntegrations, setShippingIntegrations] = useState<ShippingIntegration[]>(() => {
     const stored = localStorage.getItem("lipoimports_shipping");
     return stored ? JSON.parse(stored) : defaultShippingIntegrations;
+  });
+
+  const [banners, setBanners] = useState<Banner[]>(() => {
+    const stored = localStorage.getItem("lipoimports_banners");
+    return stored ? JSON.parse(stored) : defaultBanners;
   });
 
   // Persist to localStorage
@@ -334,6 +360,36 @@ export function StoreDataProvider({ children }: { children: ReactNode }) {
     persist("lipoimports_shipping", updated);
   };
 
+  // Banners
+  const addBanner = (banner: Omit<Banner, "id" | "order">) => {
+    const maxOrder = banners.length > 0 ? Math.max(...banners.map(b => b.order)) : 0;
+    const newBanner: Banner = { ...banner, id: generateId(), order: maxOrder + 1 };
+    const updated = [...banners, newBanner];
+    setBanners(updated);
+    persist("lipoimports_banners", updated);
+  };
+
+  const updateBanner = (id: string, banner: Partial<Banner>) => {
+    const updated = banners.map((b) => (b.id === id ? { ...b, ...banner } : b));
+    setBanners(updated);
+    persist("lipoimports_banners", updated);
+  };
+
+  const deleteBanner = (id: string) => {
+    const updated = banners.filter((b) => b.id !== id);
+    setBanners(updated);
+    persist("lipoimports_banners", updated);
+  };
+
+  const reorderBanners = (orderedIds: string[]) => {
+    const updated = banners.map(b => ({
+      ...b,
+      order: orderedIds.indexOf(b.id)
+    }));
+    setBanners(updated);
+    persist("lipoimports_banners", updated);
+  };
+
   return (
     <StoreDataContext.Provider
       value={{
@@ -360,6 +416,11 @@ export function StoreDataProvider({ children }: { children: ReactNode }) {
         updatePaymentMethod,
         shippingIntegrations,
         updateShippingIntegration,
+        banners,
+        addBanner,
+        updateBanner,
+        deleteBanner,
+        reorderBanners,
       }}
     >
       {children}

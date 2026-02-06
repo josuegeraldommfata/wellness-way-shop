@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
 import { StoreDataProvider } from "@/contexts/StoreDataContext";
+import { CartProvider } from "@/contexts/CartContext";
 
 // Pages
 import Index from "./pages/Index";
@@ -23,10 +24,12 @@ import NotFound from "./pages/NotFound";
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminAparencia from "./pages/admin/Aparencia";
+import AdminBanners from "./pages/admin/Banners";
 import AdminCategorias from "./pages/admin/Categorias";
 import AdminProdutos from "./pages/admin/Produtos";
 import AdminPedidos from "./pages/admin/Pedidos";
 import AdminVideos from "./pages/admin/Videos";
+import AdminCupons from "./pages/admin/Cupons";
 import AdminPagamentos from "./pages/admin/Pagamentos";
 import AdminEnvio from "./pages/admin/Envio";
 import AdminConfiguracoes from "./pages/admin/Configuracoes";
@@ -39,6 +42,7 @@ const App = () => (
       <AuthProvider>
         <SiteSettingsProvider>
           <StoreDataProvider>
+            <CartProvider>
             <Toaster />
             <Sonner />
             <BrowserRouter>
@@ -58,10 +62,12 @@ const App = () => (
                 {/* Admin Routes */}
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/aparencia" element={<AdminAparencia />} />
+                <Route path="/admin/banners" element={<AdminBanners />} />
                 <Route path="/admin/categorias" element={<AdminCategorias />} />
                 <Route path="/admin/produtos" element={<AdminProdutos />} />
                 <Route path="/admin/pedidos" element={<AdminPedidos />} />
                 <Route path="/admin/videos" element={<AdminVideos />} />
+                <Route path="/admin/cupons" element={<AdminCupons />} />
                 <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
                 <Route path="/admin/envio" element={<AdminEnvio />} />
                 <Route path="/admin/configuracoes" element={<AdminConfiguracoes />} />
@@ -70,6 +76,7 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
+            </CartProvider>
           </StoreDataProvider>
         </SiteSettingsProvider>
       </AuthProvider>

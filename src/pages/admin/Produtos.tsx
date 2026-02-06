@@ -2,12 +2,13 @@ import { useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useStoreData } from "@/contexts/StoreDataContext";
 import { Product, formatPrice } from "@/data/mockData";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { MultiImageUpload } from "@/components/admin/ImageUpload";
 import {
   Dialog,
   DialogContent,
@@ -380,12 +381,13 @@ export default function AdminProdutos() {
                 </div>
               </div>
 
+              {/* Product Images */}
               <div className="space-y-2">
-                <Label>URL da Imagem</Label>
-                <Input
-                  value={form.images[0]}
-                  onChange={(e) => setForm((p) => ({ ...p, images: [e.target.value] }))}
-                  placeholder="https://..."
+                <Label>Imagens do Produto</Label>
+                <MultiImageUpload
+                  values={form.images.filter(img => img !== "/placeholder.svg")}
+                  onChange={(images) => setForm((p) => ({ ...p, images: images.length > 0 ? images : ["/placeholder.svg"] }))}
+                  maxImages={5}
                 />
               </div>
 

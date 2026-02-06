@@ -15,6 +15,8 @@ import {
   X,
   Settings,
   Home,
+  Image as ImageIcon,
+  Tag,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -27,9 +29,11 @@ interface AdminLayoutProps {
 const menuItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Aparência", href: "/admin/aparencia", icon: Palette },
+  { name: "Banners", href: "/admin/banners", icon: ImageIcon },
   { name: "Categorias", href: "/admin/categorias", icon: FolderTree },
   { name: "Produtos", href: "/admin/produtos", icon: Package },
   { name: "Pedidos", href: "/admin/pedidos", icon: ShoppingCart },
+  { name: "Cupons", href: "/admin/cupons", icon: Tag },
   { name: "Vídeos", href: "/admin/videos", icon: Video },
   { name: "Pagamentos", href: "/admin/pagamentos", icon: CreditCard },
   { name: "Envio", href: "/admin/envio", icon: Truck },

@@ -46,6 +46,18 @@ export interface VideoTestimonial {
   author: string;
 }
 
+export interface Banner {
+  id: string;
+  title: string;
+  subtitle?: string;
+  buttonText?: string;
+  buttonLink?: string;
+  image: string;
+  mobileImage?: string;
+  isActive: boolean;
+  order: number;
+}
+
 export const categories: Category[] = [
   {
     id: "1",

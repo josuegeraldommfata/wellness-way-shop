@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -45,7 +45,7 @@ export default function AdminCategorias() {
     name: "",
     slug: "",
     description: "",
-    image: "/placeholder.svg",
+    image: "",
   });
 
   const [subCategoryForm, setSubCategoryForm] = useState({
@@ -74,7 +74,7 @@ export default function AdminCategorias() {
       });
     } else {
       setEditingCategory(null);
-      setCategoryForm({ name: "", slug: "", description: "", image: "/placeholder.svg" });
+      setCategoryForm({ name: "", slug: "", description: "", image: "" });
     }
     setCategoryDialogOpen(true);
   };
@@ -101,12 +101,13 @@ export default function AdminCategorias() {
     }
 
     const slug = categoryForm.slug || generateSlug(categoryForm.name);
+    const image = categoryForm.image || "/placeholder.svg";
 
     if (editingCategory) {
-      updateCategory(editingCategory.id, { ...categoryForm, slug });
+      updateCategory(editingCategory.id, { ...categoryForm, slug, image });
       toast.success("Categoria atualizada!");
     } else {
-      addCategory({ ...categoryForm, slug });
+      addCategory({ ...categoryForm, slug, image });
       toast.success("Categoria criada!");
     }
 
@@ -149,7 +150,7 @@ export default function AdminCategorias() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Categorias</h1>
             <p className="text-muted-foreground">Gerencie categorias e subcategorias</p>
@@ -174,11 +175,23 @@ export default function AdminCategorias() {
               <Card key={category.id}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <FolderTree className="h-5 w-5 text-primary" />
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                        <img
+                          src={category.image || "/placeholder.svg"}
+                          alt={category.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                       <div>
-                        <CardTitle className="text-lg">{category.name}</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <FolderTree className="h-5 w-5 text-primary" />
+                          {category.name}
+                        </CardTitle>
                         <p className="text-sm text-muted-foreground">/{category.slug}</p>
+                        {category.description && (
+                          <p className="text-sm text-muted-foreground mt-1">{category.description}</p>
+                        )}
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -233,7 +246,7 @@ export default function AdminCategorias() {
 
         {/* Category Dialog */}
         <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
-          <DialogContent>
+          <DialogContent className="max-w-lg">
             <DialogHeader>
               <DialogTitle>
                 {editingCategory ? "Editar Categoria" : "Nova Categoria"}
@@ -241,7 +254,16 @@ export default function AdminCategorias() {
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Nome</Label>
+                <Label>Imagem da Categoria</Label>
+                <ImageUpload
+                  value={categoryForm.image}
+                  onChange={(v) => setCategoryForm((p) => ({ ...p, image: v }))}
+                  aspectRatio="square"
+                  placeholder="Adicionar imagem da categoria"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Nome *</Label>
                 <Input
                   value={categoryForm.name}
                   onChange={(e) => setCategoryForm((p) => ({ ...p, name: e.target.value }))}
@@ -265,7 +287,7 @@ export default function AdminCategorias() {
                   }
                 />
               </div>
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button variant="outline" onClick={() => setCategoryDialogOpen(false)}>
                   Cancelar
                 </Button>
@@ -285,7 +307,7 @@ export default function AdminCategorias() {
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Categoria Pai</Label>
+                <Label>Categoria Pai *</Label>
                 <Select
                   value={subCategoryForm.parentCategoryId}
                   onValueChange={(v) =>
@@ -305,7 +327,7 @@ export default function AdminCategorias() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Nome</Label>
+                <Label>Nome *</Label>
                 <Input
                   value={subCategoryForm.name}
                   onChange={(e) =>
@@ -324,7 +346,7 @@ export default function AdminCategorias() {
                   placeholder="vitamina-d"
                 />
               </div>
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button variant="outline" onClick={() => setSubCategoryDialogOpen(false)}>
                   Cancelar
                 </Button>

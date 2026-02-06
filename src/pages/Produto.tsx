@@ -2,14 +2,19 @@ import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { products, formatPrice } from "@/data/mockData";
+import { formatPrice } from "@/data/mockData";
+import { useStoreData } from "@/contexts/StoreDataContext";
+import { useCart } from "@/contexts/CartContext";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ShoppingCart, Heart, Minus, Plus, ChevronLeft, Truck, ShieldCheck, CreditCard } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const Produto = () => {
   const { slug } = useParams();
   const [quantity, setQuantity] = useState(1);
+  const { products } = useStoreData();
+  const { addToCart } = useCart();
 
   const product = products.find((p) => p.slug === slug);
   const relatedProducts = products.filter((p) => p.id !== product?.id).slice(0, 4);
@@ -102,7 +107,15 @@ const Produto = () => {
 
             {/* Actions */}
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <Button variant="default" size="lg" className="flex-1">
+              <Button 
+                variant="default" 
+                size="lg" 
+                className="flex-1"
+                onClick={() => {
+                  addToCart(product, quantity);
+                  toast.success(`${product.name} adicionado ao carrinho!`);
+                }}
+              >
                 <ShoppingCart className="h-5 w-5" />
                 Adicionar ao Carrinho
               </Button>

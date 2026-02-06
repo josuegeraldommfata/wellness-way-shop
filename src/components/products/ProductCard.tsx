@@ -2,12 +2,21 @@ import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Product, formatPrice } from "@/data/mockData";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { addToCart } = useCart();
+
+  const handleAddToCart = () => {
+    addToCart(product, 1);
+    toast.success(`${product.name} adicionado ao carrinho!`);
+  };
+
   return (
     <div className="group bg-card rounded-xl border border-border overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
       {/* Image container */}
@@ -44,18 +53,14 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {/* Actions */}
         <div className="mt-4 flex flex-col gap-2">
-          <Button variant="outline" size="sm" className="w-full">
-            <Heart className="h-3.5 w-3.5" />
-            ADD TO WISHLIST
-          </Button>
-          <Button variant="default" size="sm" className="w-full">
+          <Button variant="default" size="sm" className="w-full" onClick={handleAddToCart}>
             <ShoppingCart className="h-3.5 w-3.5" />
             ADICIONAR AO CARRINHO
           </Button>
           <Button variant="success" size="sm" className="w-full" asChild>
             <Link to={`/produto/${product.slug}`}>
               <Eye className="h-3.5 w-3.5" />
-              QUICK VIEW
+              VER DETALHES
             </Link>
           </Button>
         </div>

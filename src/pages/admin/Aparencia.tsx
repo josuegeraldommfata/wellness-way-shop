@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, RotateCcw, Palette, Type, Image } from "lucide-react";
+import { Save, RotateCcw, Palette, Type, Image, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { ColorPicker } from "@/components/admin/ColorPicker";
 
 export default function AdminAparencia() {
   const { settings, updateSettings, resetSettings } = useSiteSettings();
@@ -69,10 +70,11 @@ export default function AdminAparencia() {
         </div>
 
         <Tabs defaultValue="cores" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 max-w-lg">
+          <TabsList className="grid w-full grid-cols-5 max-w-2xl">
             <TabsTrigger value="cores">Cores</TabsTrigger>
             <TabsTrigger value="textos">Textos</TabsTrigger>
             <TabsTrigger value="navbar">Navbar</TabsTrigger>
+            <TabsTrigger value="redes">Redes Sociais</TabsTrigger>
             <TabsTrigger value="footer">Footer</TabsTrigger>
           </TabsList>
 
@@ -90,53 +92,24 @@ export default function AdminAparencia() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <Label>Cor Primária (Azul)</Label>
-                    <div className="flex gap-2">
-                      <div
-                        className="w-12 h-10 rounded border"
-                        style={{ backgroundColor: `hsl(${localSettings.primaryColor})` }}
-                      />
-                      <Input
-                        value={localSettings.primaryColor}
-                        onChange={(e) => handleChange("primaryColor", e.target.value)}
-                        placeholder="217 91% 55%"
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground">Header, botões, links</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Cor Secundária (Azul Claro)</Label>
-                    <div className="flex gap-2">
-                      <div
-                        className="w-12 h-10 rounded border"
-                        style={{ backgroundColor: `hsl(${localSettings.secondaryColor})` }}
-                      />
-                      <Input
-                        value={localSettings.secondaryColor}
-                        onChange={(e) => handleChange("secondaryColor", e.target.value)}
-                        placeholder="203 67% 94%"
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground">Fundos, cards</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Cor de Destaque (Verde)</Label>
-                    <div className="flex gap-2">
-                      <div
-                        className="w-12 h-10 rounded border"
-                        style={{ backgroundColor: `hsl(${localSettings.accentColor})` }}
-                      />
-                      <Input
-                        value={localSettings.accentColor}
-                        onChange={(e) => handleChange("accentColor", e.target.value)}
-                        placeholder="145 63% 42%"
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground">CTAs, sucesso, WhatsApp</p>
-                  </div>
+                  <ColorPicker
+                    label="Cor Primária"
+                    description="Header, botões, links"
+                    value={localSettings.primaryColor}
+                    onChange={(v) => handleChange("primaryColor", v)}
+                  />
+                  <ColorPicker
+                    label="Cor Secundária"
+                    description="Fundos, cards, destaque leve"
+                    value={localSettings.secondaryColor}
+                    onChange={(v) => handleChange("secondaryColor", v)}
+                  />
+                  <ColorPicker
+                    label="Cor de Destaque"
+                    description="CTAs, sucesso, WhatsApp"
+                    value={localSettings.accentColor}
+                    onChange={(v) => handleChange("accentColor", v)}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -223,6 +196,47 @@ export default function AdminAparencia() {
             </Card>
           </TabsContent>
 
+          {/* Redes Sociais Tab */}
+          <TabsContent value="redes">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Share2 className="h-5 w-5" />
+                  Redes Sociais
+                </CardTitle>
+                <CardDescription>Configure os links das suas redes sociais</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label>Instagram URL</Label>
+                  <Input
+                    value={localSettings.footerInstagram}
+                    onChange={(e) => handleChange("footerInstagram", e.target.value)}
+                    placeholder="https://instagram.com/suapagina"
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>Facebook URL</Label>
+                    <Input
+                      value={localSettings.footerFacebook}
+                      onChange={(e) => handleChange("footerFacebook", e.target.value)}
+                      placeholder="https://facebook.com/suapagina"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>YouTube URL</Label>
+                    <Input
+                      value={localSettings.footerYoutube}
+                      onChange={(e) => handleChange("footerYoutube", e.target.value)}
+                      placeholder="https://youtube.com/@seucanal"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Footer Tab */}
           <TabsContent value="footer">
             <Card>
@@ -239,7 +253,6 @@ export default function AdminAparencia() {
                     rows={4}
                   />
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label>WhatsApp</Label>
@@ -248,40 +261,11 @@ export default function AdminAparencia() {
                       onChange={(e) => handleChange("footerPhone", e.target.value)}
                     />
                   </div>
-
                   <div className="space-y-2">
                     <Label>Email</Label>
                     <Input
                       value={localSettings.footerEmail}
                       onChange={(e) => handleChange("footerEmail", e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Instagram URL</Label>
-                  <Input
-                    value={localSettings.footerInstagram}
-                    onChange={(e) => handleChange("footerInstagram", e.target.value)}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label>Facebook URL</Label>
-                    <Input
-                      value={localSettings.footerFacebook}
-                      onChange={(e) => handleChange("footerFacebook", e.target.value)}
-                      placeholder="https://facebook.com/suapagina"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>YouTube URL</Label>
-                    <Input
-                      value={localSettings.footerYoutube}
-                      onChange={(e) => handleChange("footerYoutube", e.target.value)}
-                      placeholder="https://youtube.com/@seucanal"
                     />
                   </div>
                 </div>

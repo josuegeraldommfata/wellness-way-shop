@@ -6,14 +6,65 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { CreditCard, QrCode, Banknote, ExternalLink } from "lucide-react";
+import { CreditCard, QrCode, Banknote, ExternalLink, Shield } from "lucide-react";
 import { toast } from "sonner";
 
-const paymentIcons = {
+const paymentIcons: Record<string, typeof CreditCard> = {
   mercadopago: CreditCard,
   pix: QrCode,
   boleto: Banknote,
   credit_card: CreditCard,
+  stripe: CreditCard,
+  paypal: Shield,
+  pagseguro: CreditCard,
+};
+
+const paymentDescriptions: Record<string, string> = {
+  mercadopago: "Cartão de crédito, débito e boleto via Mercado Pago",
+  pix: "Pagamento instantâneo via PIX",
+  boleto: "Boleto bancário",
+  stripe: "Pagamentos internacionais com Stripe",
+  paypal: "Pagamentos via PayPal",
+  pagseguro: "Pagamentos via PagSeguro",
+};
+
+const paymentDocsLinks: Record<string, { label: string; url: string }> = {
+  mercadopago: { label: "Obter credenciais no Mercado Pago", url: "https://www.mercadopago.com.br/developers/panel/credentials" },
+  stripe: { label: "Obter chaves na Stripe", url: "https://dashboard.stripe.com/apikeys" },
+  paypal: { label: "Obter credenciais no PayPal", url: "https://developer.paypal.com/dashboard/applications" },
+  pagseguro: { label: "Obter token no PagSeguro", url: "https://pagseguro.uol.com.br/" },
+};
+
+interface PaymentConfigField {
+  key: string;
+  label: string;
+  type?: string;
+  placeholder?: string;
+}
+
+const paymentConfigFields: Record<string, PaymentConfigField[]> = {
+  mercadopago: [
+    { key: "publicKey", label: "Public Key", placeholder: "APP_USR-..." },
+    { key: "accessToken", label: "Access Token", type: "password", placeholder: "APP_USR-..." },
+  ],
+  pix: [
+    { key: "pixKey", label: "Chave PIX", placeholder: "email@exemplo.com ou CPF" },
+    { key: "pixName", label: "Nome do Beneficiário", placeholder: "Nome que aparecerá no PIX" },
+  ],
+  stripe: [
+    { key: "publishableKey", label: "Publishable Key", placeholder: "pk_test_..." },
+    { key: "secretKey", label: "Secret Key", type: "password", placeholder: "sk_test_..." },
+  ],
+  paypal: [
+    { key: "clientId", label: "Client ID", placeholder: "Client ID do PayPal" },
+    { key: "clientSecret", label: "Client Secret", type: "password", placeholder: "Client Secret" },
+    { key: "sandboxMode", label: "Sandbox Mode (true/false)", placeholder: "true" },
+  ],
+  pagseguro: [
+    { key: "email", label: "Email PagSeguro", placeholder: "seu@email.com" },
+    { key: "token", label: "Token", type: "password", placeholder: "Token de integração" },
+    { key: "sandboxMode", label: "Sandbox Mode (true/false)", placeholder: "true" },
+  ],
 };
 
 export default function AdminPagamentos() {
@@ -52,7 +103,9 @@ export default function AdminPagamentos() {
 
         <div className="grid gap-6">
           {paymentMethods.map((pm) => {
-            const Icon = paymentIcons[pm.type];
+            const Icon = paymentIcons[pm.type] || CreditCard;
+            const fields = paymentConfigFields[pm.type] || [];
+            const docsLink = paymentDocsLinks[pm.type];
             return (
               <Card key={pm.id}>
                 <CardHeader>
@@ -64,9 +117,7 @@ export default function AdminPagamentos() {
                       <div>
                         <CardTitle className="text-lg">{pm.name}</CardTitle>
                         <CardDescription>
-                          {pm.type === "mercadopago" && "Cartão de crédito, débito e boleto"}
-                          {pm.type === "pix" && "Pagamento instantâneo via PIX"}
-                          {pm.type === "boleto" && "Boleto bancário"}
+                          {paymentDescriptions[pm.type] || pm.name}
                         </CardDescription>
                       </div>
                     </div>
@@ -77,80 +128,44 @@ export default function AdminPagamentos() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {pm.type === "mercadopago" && (
-                    <div className="space-y-4">
+                  <div className="space-y-4">
+                    {docsLink && (
                       <div className="p-4 bg-secondary/50 rounded-lg">
                         <p className="text-sm text-muted-foreground mb-2">
-                          Para integrar com Mercado Pago, você precisa das credenciais da sua conta.
+                          Para integrar com {pm.name}, você precisa das credenciais da sua conta.
                         </p>
                         <a
-                          href="https://www.mercadopago.com.br/developers/panel/credentials"
+                          href={docsLink.url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-sm text-primary hover:underline inline-flex items-center gap-1"
                         >
-                          Obter credenciais no Mercado Pago
+                          {docsLink.label}
                           <ExternalLink className="h-3 w-3" />
                         </a>
                       </div>
+                    )}
+                    {fields.length > 0 && (
                       <div className="grid gap-4 md:grid-cols-2">
-                        <div className="space-y-2">
-                          <Label>Public Key</Label>
-                          <Input
-                            value={configs[pm.id]?.publicKey || ""}
-                            onChange={(e) =>
-                              handleConfigChange(pm.id, "publicKey", e.target.value)
-                            }
-                            placeholder="APP_USR-..."
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Access Token</Label>
-                          <Input
-                            type="password"
-                            value={configs[pm.id]?.accessToken || ""}
-                            onChange={(e) =>
-                              handleConfigChange(pm.id, "accessToken", e.target.value)
-                            }
-                            placeholder="APP_USR-..."
-                          />
-                        </div>
+                        {fields.map((field) => (
+                          <div key={field.key} className="space-y-2">
+                            <Label>{field.label}</Label>
+                            <Input
+                              type={field.type || "text"}
+                              value={configs[pm.id]?.[field.key] || ""}
+                              onChange={(e) =>
+                                handleConfigChange(pm.id, field.key, e.target.value)
+                              }
+                              placeholder={field.placeholder}
+                            />
+                          </div>
+                        ))}
                       </div>
-                      <Button onClick={() => handleSaveConfig(pm.id)}>
-                        Salvar Configurações
-                      </Button>
-                    </div>
-                  )}
-
-                  {pm.type === "pix" && (
-                    <div className="space-y-4">
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <div className="space-y-2">
-                          <Label>Chave PIX</Label>
-                          <Input
-                            value={configs[pm.id]?.pixKey || ""}
-                            onChange={(e) =>
-                              handleConfigChange(pm.id, "pixKey", e.target.value)
-                            }
-                            placeholder="email@exemplo.com ou CPF"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Nome do Beneficiário</Label>
-                          <Input
-                            value={configs[pm.id]?.pixName || ""}
-                            onChange={(e) =>
-                              handleConfigChange(pm.id, "pixName", e.target.value)
-                            }
-                            placeholder="Nome que aparecerá no PIX"
-                          />
-                        </div>
-                      </div>
-                      <Button onClick={() => handleSaveConfig(pm.id)}>
-                        Salvar Configurações
-                      </Button>
-                    </div>
-                  )}
+                    )}
+                    <Button onClick={() => handleSaveConfig(pm.id)}>
+                      Salvar Configurações
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             );
@@ -165,15 +180,14 @@ export default function AdminPagamentos() {
                 <CreditCard className="h-5 w-5 text-accent" />
               </div>
               <div>
-                <h3 className="font-medium mb-1">Integração com Mercado Pago</h3>
+                <h3 className="font-medium mb-1">Integrações de Pagamento</h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  A estrutura está preparada para integração com o Mercado Pago. Quando você
-                  adicionar um backend real, as chaves configuradas aqui serão utilizadas para
+                  A estrutura está preparada para integração com Mercado Pago, Stripe, PayPal e PagSeguro.
+                  Quando você adicionar um backend real, as chaves configuradas aqui serão utilizadas para
                   processar pagamentos.
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  <strong>Funcionalidades disponíveis:</strong> Cartão de crédito, débito, PIX,
-                  boleto, parcelamento.
+                  <strong>Gateways disponíveis:</strong> Mercado Pago, Stripe, PayPal, PagSeguro, PIX.
                 </p>
               </div>
             </div>

@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Save, RotateCcw, Palette, Type, Image } from "lucide-react";
 import { toast } from "sonner";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 
 export default function AdminAparencia() {
   const { settings, updateSettings, resetSettings } = useSiteSettings();
@@ -161,20 +162,21 @@ export default function AdminAparencia() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>URL da Logo</Label>
+                    <Label>Texto da Barra Superior</Label>
                     <Input
-                      value={localSettings.logoUrl}
-                      onChange={(e) => handleChange("logoUrl", e.target.value)}
-                      placeholder="https://..."
+                      value={localSettings.topBarText}
+                      onChange={(e) => handleChange("topBarText", e.target.value)}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Texto da Barra Superior</Label>
-                  <Input
-                    value={localSettings.topBarText}
-                    onChange={(e) => handleChange("topBarText", e.target.value)}
+                  <Label>Logo do Site (upload de imagem)</Label>
+                  <ImageUpload
+                    value={localSettings.logoUrl}
+                    onChange={(v) => handleChange("logoUrl", v)}
+                    aspectRatio="auto"
+                    placeholder="Envie a logo do e-commerce (PNG/JPG)"
                   />
                 </div>
               </CardContent>
@@ -262,6 +264,26 @@ export default function AdminAparencia() {
                     value={localSettings.footerInstagram}
                     onChange={(e) => handleChange("footerInstagram", e.target.value)}
                   />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>Facebook URL</Label>
+                    <Input
+                      value={localSettings.footerFacebook}
+                      onChange={(e) => handleChange("footerFacebook", e.target.value)}
+                      placeholder="https://facebook.com/suapagina"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>YouTube URL</Label>
+                    <Input
+                      value={localSettings.footerYoutube}
+                      onChange={(e) => handleChange("footerYoutube", e.target.value)}
+                      placeholder="https://youtube.com/@seucanal"
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>

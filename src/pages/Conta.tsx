@@ -1,11 +1,20 @@
+import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Package, Heart, MapPin, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Conta = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
   return (
     <Layout>
       <div className="bg-muted py-8">
@@ -91,7 +100,7 @@ const Conta = () => {
                 </div>
 
                 <div className="border-t border-border mt-8 pt-6">
-                  <Button variant="ghost" className="text-destructive hover:text-destructive">
+                  <Button variant="ghost" className="text-destructive hover:text-destructive" onClick={handleLogout}>
                     <LogOut className="h-4 w-4 mr-2" />
                     Sair da conta
                   </Button>

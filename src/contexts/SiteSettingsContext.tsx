@@ -22,6 +22,8 @@ export interface SiteSettings {
   footerPhone: string;
   footerEmail: string;
   footerInstagram: string;
+  footerFacebook: string;
+  footerYoutube: string;
   
   // Top bar
   topBarText: string;
@@ -60,6 +62,8 @@ const defaultSettings: SiteSettings = {
   footerPhone: "(83) 99339-6445",
   footerEmail: "contato@lipoimports.com.br",
   footerInstagram: "https://instagram.com/lipoimports",
+  footerFacebook: "",
+  footerYoutube: "",
   
   // Top bar
   topBarText: "Importados para seu bem-estar!",

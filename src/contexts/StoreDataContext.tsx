@@ -29,7 +29,7 @@ export interface Order {
 export interface PaymentMethod {
   id: string;
   name: string;
-  type: "mercadopago" | "pix" | "boleto" | "credit_card";
+  type: "mercadopago" | "pix" | "boleto" | "credit_card" | "stripe" | "paypal" | "pagseguro";
   enabled: boolean;
   config: Record<string, string>;
 }
@@ -154,20 +154,35 @@ const defaultPaymentMethods: PaymentMethod[] = [
     name: "Mercado Pago",
     type: "mercadopago",
     enabled: false,
-    config: {
-      publicKey: "",
-      accessToken: "",
-    },
+    config: { publicKey: "", accessToken: "" },
   },
   {
     id: "pm-2",
     name: "PIX",
     type: "pix",
     enabled: true,
-    config: {
-      pixKey: "",
-      pixName: "LipoImports",
-    },
+    config: { pixKey: "", pixName: "LipoImports" },
+  },
+  {
+    id: "pm-3",
+    name: "Stripe",
+    type: "stripe",
+    enabled: false,
+    config: { publishableKey: "", secretKey: "" },
+  },
+  {
+    id: "pm-4",
+    name: "PayPal",
+    type: "paypal",
+    enabled: false,
+    config: { clientId: "", clientSecret: "", sandboxMode: "true" },
+  },
+  {
+    id: "pm-5",
+    name: "PagSeguro",
+    type: "pagseguro",
+    enabled: false,
+    config: { email: "", token: "", sandboxMode: "true" },
   },
 ];
 

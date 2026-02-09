@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Instagram, Phone, Mail } from "lucide-react";
+import { Instagram, Phone, Mail, Facebook, Youtube } from "lucide-react";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
 export function Footer() {
@@ -18,14 +18,36 @@ export function Footer() {
               {settings.footerAboutText}
             </p>
             <div className="flex gap-3 mt-4">
-              <a
-                href={settings.footerInstagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
-              >
-                <Instagram className="h-5 w-5" />
-              </a>
+              {settings.footerInstagram && (
+                <a
+                  href={settings.footerInstagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
+                >
+                  <Instagram className="h-5 w-5" />
+                </a>
+              )}
+              {settings.footerFacebook && (
+                <a
+                  href={settings.footerFacebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
+                >
+                  <Facebook className="h-5 w-5" />
+                </a>
+              )}
+              {settings.footerYoutube && (
+                <a
+                  href={settings.footerYoutube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
+                >
+                  <Youtube className="h-5 w-5" />
+                </a>
+              )}
             </div>
           </div>
 

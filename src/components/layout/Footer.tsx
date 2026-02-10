@@ -142,7 +142,7 @@ export function Footer() {
       {/* Copyright */}
       <div className="border-t border-white/20">
         <div className="container-custom py-4 text-center text-sm opacity-80">
-          Copyright © 2025 – {settings.siteName}. All Rights Reserved.
+          Copyright © 2026 – {settings.siteName}. All Rights Reserved . criado por agencia Info Tech.
         </div>
       </div>
     </footer>

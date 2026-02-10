@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { useStoreData, Order } from "@/contexts/StoreDataContext";
 import { formatPrice } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +29,33 @@ import {
 import { Search, Eye, Package, Clock, Truck, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
+interface OrderItem {
+  productName: string;
+  quantity: number;
+  price: number;
+}
+
+interface Order {
+  id: number;
+  items: OrderItem[];
+  subtotal: number;
+  discount: number;
+  total: number;
+  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  paymentMethod: string;
+  paymentId?: string;
+  userInfo: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+  };
+  coupon?: string;
+  trackingCode?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const statusConfig = {
   pending: { label: "Pendente", color: "bg-yellow-100 text-yellow-700", icon: Clock },
   processing: { label: "Processando", color: "bg-blue-100 text-blue-700", icon: Package },
@@ -39,39 +65,90 @@ const statusConfig = {
 };
 
 export default function AdminPedidos() {
-  const { orders, updateOrder } = useStoreData();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
 
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/orders");
+      if (response.ok) {
+        const data = await response.json();
+        setOrders(data);
+      } else {
+        toast.error("Erro ao carregar pedidos");
+      }
+    } catch (error) {
+      toast.error("Erro ao conectar com o servidor");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const openDialog = (order: Order) => {
     setSelectedOrder(order);
     setDialogOpen(true);
   };
 
-  const handleUpdateStatus = (status: Order["status"]) => {
+  const handleUpdateStatus = async (status: Order["status"]) => {
     if (selectedOrder) {
-      updateOrder(selectedOrder.id, { status });
-      setSelectedOrder({ ...selectedOrder, status });
-      toast.success("Status atualizado!");
+      try {
+        const response = await fetch(`http://localhost:5000/api/orders/${selectedOrder.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status }),
+        });
+        if (response.ok) {
+          setSelectedOrder({ ...selectedOrder, status });
+          toast.success("Status atualizado!");
+          fetchOrders(); // Recarregar lista
+        } else {
+          toast.error("Erro ao atualizar status");
+        }
+      } catch (error) {
+        toast.error("Erro ao conectar com o servidor");
+      }
     }
   };
 
-  const handleUpdateTracking = (trackingCode: string) => {
+  const handleUpdateTracking = async (trackingCode: string) => {
     if (selectedOrder) {
-      updateOrder(selectedOrder.id, { trackingCode });
-      setSelectedOrder({ ...selectedOrder, trackingCode });
-      toast.success("Código de rastreio salvo!");
+      try {
+        const response = await fetch(`http://localhost:5000/api/orders/${selectedOrder.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ trackingCode }),
+        });
+        if (response.ok) {
+          setSelectedOrder({ ...selectedOrder, trackingCode });
+          toast.success("Código de rastreio salvo!");
+          fetchOrders(); // Recarregar lista
+        } else {
+          toast.error("Erro ao salvar código de rastreio");
+        }
+      } catch (error) {
+        toast.error("Erro ao conectar com o servidor");
+      }
     }
   };
 
   const filteredOrders = orders.filter((o) => {
     const matchesSearch =
-      o.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      o.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      o.id.toLowerCase().includes(searchTerm.toLowerCase());
+      o.userInfo.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      o.userInfo.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      o.id.toString().toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === "all" || o.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -140,13 +217,13 @@ export default function AdminPedidos() {
                   const status = statusConfig[order.status];
                   return (
                     <TableRow key={order.id}>
-                      <TableCell className="font-mono text-sm">{order.id}</TableCell>
+                      <TableCell className="font-mono text-sm">#{order.id}</TableCell>
                       <TableCell>
                         <div>
                           <p className="font-medium">
-                            {order.customerName} {order.customerLastName}
+                            {order.userInfo.name}
                           </p>
-                          <p className="text-sm text-muted-foreground">{order.customerPhone}</p>
+                          <p className="text-sm text-muted-foreground">{order.userInfo.phone}</p>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -195,26 +272,21 @@ export default function AdminPedidos() {
                     <div>
                       <p className="text-muted-foreground">Nome</p>
                       <p className="font-medium">
-                        {selectedOrder.customerName} {selectedOrder.customerLastName}
+                        {selectedOrder.userInfo.name}
                       </p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">Email</p>
-                      <p className="font-medium">{selectedOrder.customerEmail}</p>
+                      <p className="font-medium">{selectedOrder.userInfo.email}</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">WhatsApp</p>
-                      <p className="font-medium">{selectedOrder.customerPhone}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">CEP</p>
-                      <p className="font-medium">{selectedOrder.customerCep}</p>
+                      <p className="font-medium">{selectedOrder.userInfo.phone}</p>
                     </div>
                     <div className="col-span-2">
                       <p className="text-muted-foreground">Endereço</p>
                       <p className="font-medium">
-                        {selectedOrder.customerAddress}, {selectedOrder.customerNeighborhood} -{" "}
-                        {selectedOrder.customerCity}/{selectedOrder.customerState}
+                        {selectedOrder.userInfo.address}
                       </p>
                     </div>
                   </CardContent>

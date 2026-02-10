@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { useStoreData } from "@/contexts/StoreDataContext";
 import { Product, formatPrice } from "@/data/mockData";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,7 +33,9 @@ import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AdminProdutos() {
-  const { products, addProduct, updateProduct, deleteProduct, categories } = useStoreData();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -58,6 +59,30 @@ export default function AdminProdutos() {
     isBestSeller: false,
     tags: [],
   });
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/products');
+      const data = await response.json();
+      setProducts(data);
+    } catch (error) {
+      toast.error('Erro ao carregar produtos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    // Mock categories for now, you can add API later
+    setCategories([
+      { id: '1', name: 'Canetas Emagrecedoras', slug: 'canetas-emagrecedoras' },
+    ]);
+  };
 
   const generateSlug = (name: string) => {
     return name
@@ -111,7 +136,7 @@ export default function AdminProdutos() {
     setDialogOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name || !form.category || form.price <= 0) {
       toast.error("Preencha nome, categoria e preço");
       return;
@@ -126,21 +151,40 @@ export default function AdminProdutos() {
       installmentPrice,
     };
 
-    if (editingProduct) {
-      updateProduct(editingProduct.id, productData);
-      toast.success("Produto atualizado!");
-    } else {
-      addProduct(productData);
-      toast.success("Produto criado!");
+    try {
+      if (editingProduct) {
+        await fetch(`http://localhost:5000/api/products/${editingProduct.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(productData),
+        });
+        toast.success("Produto atualizado!");
+      } else {
+        await fetch('http://localhost:5000/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(productData),
+        });
+        toast.success("Produto criado!");
+      }
+      fetchProducts();
+      setDialogOpen(false);
+    } catch (error) {
+      toast.error("Erro ao salvar produto");
     }
-
-    setDialogOpen(false);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm("Tem certeza que deseja excluir este produto?")) {
-      deleteProduct(id);
-      toast.success("Produto excluído!");
+      try {
+        await fetch(`http://localhost:5000/api/products/${id}`, {
+          method: 'DELETE',
+        });
+        toast.success("Produto excluído!");
+        fetchProducts();
+      } catch (error) {
+        toast.error("Erro ao excluir produto");
+      }
     }
   };
 
@@ -149,6 +193,10 @@ export default function AdminProdutos() {
     const matchesCategory = filterCategory === "all" || p.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
+
+  if (loading) {
+    return <AdminLayout><div>Carregando...</div></AdminLayout>;
+  }
 
   return (
     <AdminLayout>

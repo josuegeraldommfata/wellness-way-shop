@@ -4,12 +4,16 @@ const {
   createOrder,
   getOrders,
   getOrder,
+  updateOrderStatus,
 } = require('../controllers/orderController');
+const { authenticate, isAdmin } = require('../middleware/auth');
 
-// Rotas
+// Public (checkout)
 router.post('/', createOrder);
-router.get('/', getOrders);
-router.get('/:id', getOrder);
-router.put('/:id', updateOrderStatus);
+
+// Admin
+router.get('/', authenticate, isAdmin, getOrders);
+router.get('/:id', authenticate, getOrder);
+router.put('/:id', authenticate, isAdmin, updateOrderStatus);
 
 module.exports = router;

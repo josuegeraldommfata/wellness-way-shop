@@ -7,14 +7,15 @@ const {
   updateProduct,
   deleteProduct,
 } = require('../controllers/productController');
+const { authenticate, isAdmin } = require('../middleware/auth');
 
-// Rotas públicas
+// Public
 router.get('/', getProducts);
 router.get('/:id', getProduct);
 
-// Rotas privadas (futuramente com middleware de autenticação)
-router.post('/', createProduct);
-router.put('/:id', updateProduct);
-router.delete('/:id', deleteProduct);
+// Admin
+router.post('/', authenticate, isAdmin, createProduct);
+router.put('/:id', authenticate, isAdmin, updateProduct);
+router.delete('/:id', authenticate, isAdmin, deleteProduct);
 
 module.exports = router;

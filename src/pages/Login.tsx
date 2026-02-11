@@ -31,8 +31,19 @@ export default function Login() {
     setError("");
     setLoading(true);
 
+    // Log login attempt
+    try {
+      await fetch('/api/logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user: email, action: 'login_attempt', ip: 'unknown' })
+      });
+    } catch (error) {
+      console.error('Failed to log login attempt:', error);
+    }
+
     const result = await login(email, password);
-    
+
     setLoading(false);
 
     if (result.success) {

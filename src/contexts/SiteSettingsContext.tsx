@@ -3,18 +3,19 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 export interface SiteSettings {
   // Branding
   logoUrl: string;
+  faviconUrl: string;
   siteName: string;
-  
+
   // Colors (HSL values without hsl())
   primaryColor: string;
   secondaryColor: string;
   accentColor: string;
-  
+
   // Navbar
   navbarBgColor: string;
   navbarTextColor: string;
   navbarLinks: { name: string; href: string }[];
-  
+
   // Footer
   footerBgColor: string;
   footerTextColor: string;
@@ -24,7 +25,7 @@ export interface SiteSettings {
   footerInstagram: string;
   footerFacebook: string;
   footerYoutube: string;
-  
+
   // Top bar
   topBarText: string;
 }
@@ -38,13 +39,14 @@ interface SiteSettingsContextType {
 const defaultSettings: SiteSettings = {
   // Branding
   logoUrl: "",
+  faviconUrl: "",
   siteName: "LipoImports",
-  
+
   // Colors
   primaryColor: "217 91% 55%",
   secondaryColor: "203 67% 94%",
   accentColor: "145 63% 42%",
-  
+
   // Navbar
   navbarBgColor: "217 91% 55%",
   navbarTextColor: "0 0% 100%",
@@ -54,7 +56,7 @@ const defaultSettings: SiteSettings = {
     { name: "Suplementos", href: "/loja?categoria=suplementos" },
     { name: "Promoções", href: "/loja?promocoes=true" },
   ],
-  
+
   // Footer
   footerBgColor: "217 91% 55%",
   footerTextColor: "0 0% 100%",
@@ -64,7 +66,7 @@ const defaultSettings: SiteSettings = {
   footerInstagram: "https://instagram.com/lipoimports",
   footerFacebook: "",
   footerYoutube: "",
-  
+
   // Top bar
   topBarText: "Importados para seu bem-estar!",
 };
@@ -79,7 +81,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     localStorage.setItem("lipoimports_settings", JSON.stringify(settings));
-    
+
     // Apply CSS variables
     const root = document.documentElement;
     root.style.setProperty("--primary", settings.primaryColor);

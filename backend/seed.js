@@ -1,5 +1,6 @@
 const sequelize = require('./database');
 const Product = require('./models/Product');
+const User = require('./models/User');
 
 // Dados mockados (baseado no frontend)
 const products = [
@@ -138,9 +139,27 @@ const seedDB = async () => {
     await sequelize.authenticate();
     await sequelize.sync(); // Sincronizar modelos com banco
 
-    // Limpar produtos existentes
+    // Limpar dados existentes
     await Product.destroy({ where: {} });
-    console.log('Produtos existentes removidos');
+    await User.destroy({ where: {} });
+    console.log('Dados existentes removidos');
+
+    // Inserir usuários de teste
+    await User.create({
+      email: 'admin@teste.com',
+      password: '123456',
+      role: 'admin',
+      name: 'Administrador'
+    });
+
+    await User.create({
+      email: 'cliente@teste.com',
+      password: '123456',
+      role: 'client',
+      name: 'Cliente Teste'
+    });
+
+    console.log('Usuários de teste inseridos');
 
     // Inserir novos produtos
     await Product.bulkCreate(products);

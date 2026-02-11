@@ -1,12 +1,9 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const mercadopago = require('mercadopago');
+// const { MercadoPago } = require('mercadopago');
 const paypal = require('paypal-rest-sdk');
 
-// Configurar Mercado Pago
-mercadopago.configure({
-  access_token: process.env.MERCADO_PAGO_ACCESS_TOKEN,
-  integrator_id: process.env.MERCADO_PAGO_INTEGRATOR_ID || undefined, // Opcional para produção
-});
+// // Configurar Mercado Pago
+// const mpClient = new MercadoPago({ accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN });
 
 // Configurar PayPal
 paypal.configure({
@@ -187,6 +184,5 @@ const createPayPalOrder = async (req, res) => {
 module.exports = {
   createStripeSession,
   createMercadoPagoPreference,
-  createPagSeguroPayment,
   createPayPalOrder,
 };

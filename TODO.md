@@ -23,3 +23,11 @@
 - [ ] Testar endpoints com Postman
 - [ ] Verificar painel admin funcionando
 - [ ] Executar seed para popular banco
+
+## 5. Implementar Checkout Frontend
+- [x] Criar página Checkout.tsx
+- [x] Adicionar rota /checkout no App.tsx
+- [x] Modificar Carrinho.tsx: botão "Finalizar Compra" navegar para /checkout
+- [x] Implementar formulário de checkout com dados de usuário, envio e pagamento
+- [x] Integrar criação de pedido via API POST /api/orders
+- [ ] Placeholder para integração de pagamento (sem chaves por enquanto)

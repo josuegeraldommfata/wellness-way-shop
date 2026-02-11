@@ -58,7 +58,10 @@ export default function AdminEnvio() {
                         {si.type === "melhor_envio" &&
                           "Cotação automática de frete com múltiplas transportadoras"}
                         {si.type === "correios" && "Envio via Correios (PAC, SEDEX)"}
-                        {si.type === "jadlog" && "Transportadora JadLog"}
+                        {si.type === "jadlog" && "Transportadora JadLog - Entrega expressa"}
+                        {si.type === "azul_cargo" && "Azul Cargo - Transportadora especializada"}
+                        {si.type === "loggi" && "Loggi - Entrega urbana e regional"}
+                        {si.type === "total_express" && "Total Express - Rede nacional de entrega"}
                       </CardDescription>
                     </div>
                   </div>
@@ -120,6 +123,204 @@ export default function AdminEnvio() {
                       Envio manual via Correios. Para cotação automática de frete,
                       recomendamos usar o Melhor Envio que já inclui os Correios.
                     </p>
+                  </div>
+                )}
+
+                {si.type === "jadlog" && (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-secondary/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        JadLog oferece entrega expressa em todo o território nacional.
+                      </p>
+                      <a
+                        href="https://jadlog.com.br"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                      >
+                        Criar conta na JadLog
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>API Key</Label>
+                        <Input
+                          type="password"
+                          value={configs[si.id]?.apiKey || ""}
+                          onChange={(e) =>
+                            handleConfigChange(si.id, "apiKey", e.target.value)
+                          }
+                          placeholder="Sua API Key da JadLog"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={configs[si.id]?.sandboxMode === "true"}
+                          onCheckedChange={(v) =>
+                            handleConfigChange(si.id, "sandboxMode", v ? "true" : "false")
+                          }
+                        />
+                        <Label>Modo Sandbox (testes)</Label>
+                      </div>
+                    </div>
+                    <Button onClick={() => handleSaveConfig(si.id)}>
+                      Salvar Configurações
+                    </Button>
+                  </div>
+                )}
+
+                {si.type === "azul_cargo" && (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-secondary/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Azul Cargo é especializada em transporte de cargas e encomendas.
+                      </p>
+                      <a
+                        href="https://azulcargo.com.br"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                      >
+                        Criar conta na Azul Cargo
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Client ID</Label>
+                        <Input
+                          type="text"
+                          value={configs[si.id]?.clientId || ""}
+                          onChange={(e) =>
+                            handleConfigChange(si.id, "clientId", e.target.value)
+                          }
+                          placeholder="Seu Client ID da Azul Cargo"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Client Secret</Label>
+                        <Input
+                          type="password"
+                          value={configs[si.id]?.clientSecret || ""}
+                          onChange={(e) =>
+                            handleConfigChange(si.id, "clientSecret", e.target.value)
+                          }
+                          placeholder="Seu Client Secret da Azul Cargo"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={configs[si.id]?.sandboxMode === "true"}
+                          onCheckedChange={(v) =>
+                            handleConfigChange(si.id, "sandboxMode", v ? "true" : "false")
+                          }
+                        />
+                        <Label>Modo Sandbox (testes)</Label>
+                      </div>
+                    </div>
+                    <Button onClick={() => handleSaveConfig(si.id)}>
+                      Salvar Configurações
+                    </Button>
+                  </div>
+                )}
+
+                {si.type === "loggi" && (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-secondary/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Loggi oferece entrega rápida e sustentável em áreas urbanas.
+                      </p>
+                      <a
+                        href="https://www.loggi.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                      >
+                        Criar conta na Loggi
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>API Key</Label>
+                        <Input
+                          type="password"
+                          value={configs[si.id]?.apiKey || ""}
+                          onChange={(e) =>
+                            handleConfigChange(si.id, "apiKey", e.target.value)
+                          }
+                          placeholder="Sua API Key da Loggi"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={configs[si.id]?.sandboxMode === "true"}
+                          onCheckedChange={(v) =>
+                            handleConfigChange(si.id, "sandboxMode", v ? "true" : "false")
+                          }
+                        />
+                        <Label>Modo Sandbox (testes)</Label>
+                      </div>
+                    </div>
+                    <Button onClick={() => handleSaveConfig(si.id)}>
+                      Salvar Configurações
+                    </Button>
+                  </div>
+                )}
+
+                {si.type === "total_express" && (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-secondary/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Total Express possui uma ampla rede de distribuição nacional.
+                      </p>
+                      <a
+                        href="https://www.totalexpress.com.br"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                      >
+                        Criar conta na Total Express
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Username</Label>
+                        <Input
+                          type="text"
+                          value={configs[si.id]?.username || ""}
+                          onChange={(e) =>
+                            handleConfigChange(si.id, "username", e.target.value)
+                          }
+                          placeholder="Seu username da Total Express"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Password</Label>
+                        <Input
+                          type="password"
+                          value={configs[si.id]?.password || ""}
+                          onChange={(e) =>
+                            handleConfigChange(si.id, "password", e.target.value)
+                          }
+                          placeholder="Sua senha da Total Express"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={configs[si.id]?.sandboxMode === "true"}
+                          onCheckedChange={(v) =>
+                            handleConfigChange(si.id, "sandboxMode", v ? "true" : "false")
+                          }
+                        />
+                        <Label>Modo Sandbox (testes)</Label>
+                      </div>
+                    </div>
+                    <Button onClick={() => handleSaveConfig(si.id)}>
+                      Salvar Configurações
+                    </Button>
                   </div>
                 )}
               </CardContent>

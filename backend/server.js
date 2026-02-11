@@ -6,12 +6,36 @@ const sequelize = require('./database');
 // Carregar variáveis de ambiente
 dotenv.config();
 
+// Importar modelos para sincronização
+const Product = require('./models/Product');
+const Order = require('./models/Order');
+const Log = require('./models/Log');
+const Settings = require('./models/Settings');
+
 // Importar rotas
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
 const paymentRoutes = require('./routes/payments');
+const shippingRoutes = require('./routes/shipping');
+const settingsRoutes = require('./routes/settings');
 
 const app = express();
+
+// In-memory storage for logs and alerts (in production, use database)
+let logs = [];
+let alerts = [];
+let aiAnalysis = {
+  anomalyLevel: 'Normal',
+  confidenceScores: { normal: 1.0, suspicious: 0.0, critical: 0.0 }
+};
+
+// Default settings
+let settings = {
+  anomalyThresholdLow: 1,
+  anomalyThresholdMedium: 3,
+  anomalyThresholdHigh: 5,
+  aiEnabled: true
+};
 
 // Middleware
 app.use(cors());
@@ -30,6 +54,114 @@ sequelize.authenticate()
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/shipping', shippingRoutes);
+app.use('/api/settings', settingsRoutes);
+
+// Rota para logs de atividade
+app.post('/api/logs', (req, res) => {
+  const { user, action, ip } = req.body;
+  const timestamp = new Date();
+
+  // Salvar log
+  logs.push({ user, action, ip, timestamp });
+
+  // Detecção de anomalias para tentativas de login (per user, across IPs)
+  if (action === 'login') {
+    const sixtySecondsAgo = new Date(timestamp.getTime() - 60 * 1000);
+    const recentLoginLogs = logs.filter(log =>
+      log.user === user &&
+      log.action === 'login' &&
+      new Date(log.timestamp) >= sixtySecondsAgo
+    );
+
+    const count = recentLoginLogs.length;
+    let level = 'LOW';
+    let explanation = '';
+
+    if (count >= settings.anomalyThresholdHigh) {
+      level = 'HIGH';
+      explanation = `Anomaly detected: ${count} login attempts in 1 minute`;
+    } else if (count >= settings.anomalyThresholdMedium) {
+      level = 'MEDIUM';
+      explanation = `Anomaly detected: ${count} login attempts in 1 minute`;
+    } else if (count >= settings.anomalyThresholdLow) {
+      level = 'LOW';
+      explanation = `Anomaly detected: ${count} login attempts in 1 minute`;
+    }
+
+    // Save anomaly if any level (including LOW for tracking)
+    alerts.push({
+      user,
+      ip,
+      timestamp,
+      activity: 'login_attempt',
+      level,
+      score: count,
+      explanation
+    });
+  }
+
+  // Análise AI (placeholder)
+  if (settings.aiEnabled) {
+    analyzeBehavior(user);
+  }
+
+  res.json({ message: 'Log recorded' });
+});
+
+// Rota para obter logs (para admin)
+app.get('/api/logs', (req, res) => {
+  res.json(logs);
+});
+
+// Rota para obter alertas
+app.get('/api/alerts', (req, res) => {
+  res.json(alerts);
+});
+
+// Rota para análise AI
+app.get('/api/ai-analysis', (req, res) => {
+  res.json(aiAnalysis);
+});
+
+// Função de análise AI (placeholder)
+function analyzeBehavior(user) {
+  // Analyze logs and alerts for patterns
+  const userLogs = logs.filter(log => log.user === user && log.action === 'login');
+  const userAlerts = alerts.filter(alert => alert.user === user);
+
+  // Detect patterns: unique IPs, attempts in last hour
+  const uniqueIPs = new Set(userLogs.map(log => log.ip).filter(ip => ip)).size;
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  const attemptsInLastHour = userLogs.filter(log => new Date(log.timestamp) >= oneHourAgo).length;
+  const highAlerts = userAlerts.filter(alert => alert.level === 'HIGH').length;
+
+  // Simple rule-based AI classification
+  if (uniqueIPs > 5 || attemptsInLastHour > 20 || highAlerts > 5) {
+    aiAnalysis.anomalyLevel = 'Critical';
+    aiAnalysis.confidenceScores = { normal: 0.0, suspicious: 0.1, critical: 0.9 };
+  } else if (uniqueIPs > 3 || attemptsInLastHour > 10 || highAlerts > 2) {
+    aiAnalysis.anomalyLevel = 'Suspicious';
+    aiAnalysis.confidenceScores = { normal: 0.2, suspicious: 0.6, critical: 0.2 };
+  } else {
+    aiAnalysis.anomalyLevel = 'Normal';
+    aiAnalysis.confidenceScores = { normal: 0.9, suspicious: 0.05, critical: 0.05 };
+  }
+
+  // Future: Integrate with ChatGPT/GNN API
+  // async function analyzeWithAI(userLogs, userAlerts) {
+  //   const prompt = `Analyze user behavior for anomalies. Logs: ${JSON.stringify(userLogs.slice(-50))}. Alerts: ${JSON.stringify(userAlerts.slice(-10))}. Classify as Normal, Suspicious, or Critical.`;
+  //   const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` },
+  //     body: JSON.stringify({ model: 'gpt-3.5-turbo', messages: [{ role: 'user', content: prompt }] })
+  //   });
+  //   const data = await response.json();
+  //   return data.choices[0].message.content.trim();
+  // }
+  // const aiResult = await analyzeWithAI(userLogs, userAlerts);
+  // aiAnalysis.anomalyLevel = aiResult.includes('Critical') ? 'Critical' : aiResult.includes('Suspicious') ? 'Suspicious' : 'Normal';
+}
 
 // Rota de teste
 app.get('/', (req, res) => {

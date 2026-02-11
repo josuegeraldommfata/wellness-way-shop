@@ -17,7 +17,6 @@ const Produto = () => {
   const { addToCart } = useCart();
 
   const product = products.find((p) => p.slug === slug);
-  const relatedProducts = products.filter((p) => p.id !== product?.id).slice(0, 4);
 
   if (!product) {
     return (
@@ -107,9 +106,9 @@ const Produto = () => {
 
             {/* Actions */}
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <Button 
-                variant="default" 
-                size="lg" 
+              <Button
+                variant="default"
+                size="lg"
                 className="flex-1"
                 onClick={() => {
                   addToCart(product, quantity);
@@ -154,8 +153,8 @@ const Produto = () => {
         <div className="mt-16">
           <h2 className="text-2xl font-bold mb-8">Produtos relacionados</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {relatedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {products.filter((p) => p.id !== product.id).slice(0, 4).map((relatedProduct) => (
+              <ProductCard key={relatedProduct.id} product={relatedProduct} />
             ))}
           </div>
         </div>

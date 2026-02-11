@@ -152,6 +152,16 @@ export default function AdminAparencia() {
                     placeholder="Envie a logo do e-commerce (PNG/JPG)"
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <Label>Favicon do Site (upload de imagem)</Label>
+                  <ImageUpload
+                    value={localSettings.faviconUrl}
+                    onChange={(v) => handleChange("faviconUrl", v)}
+                    aspectRatio="1"
+                    placeholder="Envie o favicon do site (PNG/JPG, 32x32px recomendado)"
+                  />
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

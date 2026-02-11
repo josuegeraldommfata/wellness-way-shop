@@ -4,6 +4,7 @@ const {
   createOrder,
   getOrders,
   getOrder,
+  updateOrderStatus,
 } = require('../controllers/orderController');
 
 // Rotas

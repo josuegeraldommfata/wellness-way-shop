@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Tag, X } from "lucide-rea
 import { toast } from "sonner";
 
 const Carrinho = () => {
+  const navigate = useNavigate();
   const {
     items,
     updateQuantity,
@@ -191,7 +192,7 @@ const Carrinho = () => {
                   </div>
                 )}
 
-                <Button variant="success" size="lg" className="w-full mt-6">
+                <Button variant="success" size="lg" className="w-full mt-6" onClick={() => navigate('/checkout')}>
                   Finalizar Compra
                   <ArrowRight className="h-4 w-4" />
                 </Button>

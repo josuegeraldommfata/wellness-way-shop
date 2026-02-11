@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { products as initialProducts, categories as initialCategories, videoTestimonials as initialVideos, Product, Category, VideoTestimonial, Banner } from "@/data/mockData";
 
 export interface SubCategory {
@@ -37,7 +37,7 @@ export interface PaymentMethod {
 export interface ShippingIntegration {
   id: string;
   name: string;
-  type: "melhor_envio" | "correios" | "jadlog";
+  type: "melhor_envio" | "correios" | "jadlog" | "azul_cargo" | "loggi" | "total_express";
   enabled: boolean;
   config: Record<string, string>;
 }
@@ -48,38 +48,38 @@ interface StoreDataContextType {
   addProduct: (product: Omit<Product, "id">) => void;
   updateProduct: (id: string, product: Partial<Product>) => void;
   deleteProduct: (id: string) => void;
-  
+
   // Categories
   categories: Category[];
   addCategory: (category: Omit<Category, "id">) => void;
   updateCategory: (id: string, category: Partial<Category>) => void;
   deleteCategory: (id: string) => void;
-  
+
   // Subcategories
   subCategories: SubCategory[];
   addSubCategory: (subCategory: Omit<SubCategory, "id">) => void;
   updateSubCategory: (id: string, subCategory: Partial<SubCategory>) => void;
   deleteSubCategory: (id: string) => void;
-  
+
   // Videos
   videoTestimonials: VideoTestimonial[];
   addVideo: (video: Omit<VideoTestimonial, "id">) => void;
   updateVideo: (id: string, video: Partial<VideoTestimonial>) => void;
   deleteVideo: (id: string) => void;
-  
+
   // Orders
   orders: Order[];
   addOrder: (order: Omit<Order, "id" | "createdAt">) => void;
   updateOrder: (id: string, order: Partial<Order>) => void;
-  
+
   // Payment Methods
   paymentMethods: PaymentMethod[];
   updatePaymentMethod: (id: string, config: Partial<PaymentMethod>) => void;
-  
+
   // Shipping
   shippingIntegrations: ShippingIntegration[];
   updateShippingIntegration: (id: string, config: Partial<ShippingIntegration>) => void;
-  
+
   // Banners
   banners: Banner[];
   addBanner: (banner: Omit<Banner, "id" | "order">) => void;
@@ -204,6 +204,48 @@ const defaultShippingIntegrations: ShippingIntegration[] = [
     type: "correios",
     enabled: true,
     config: {},
+  },
+  {
+    id: "ship-3",
+    name: "JadLog",
+    type: "jadlog",
+    enabled: false,
+    config: {
+      apiKey: "",
+      sandboxMode: "true",
+    },
+  },
+  {
+    id: "ship-4",
+    name: "Azul Cargo",
+    type: "azul_cargo",
+    enabled: false,
+    config: {
+      clientId: "",
+      clientSecret: "",
+      sandboxMode: "true",
+    },
+  },
+  {
+    id: "ship-5",
+    name: "Loggi",
+    type: "loggi",
+    enabled: false,
+    config: {
+      apiKey: "",
+      sandboxMode: "true",
+    },
+  },
+  {
+    id: "ship-6",
+    name: "Total Express",
+    type: "total_express",
+    enabled: false,
+    config: {
+      username: "",
+      password: "",
+      sandboxMode: "true",
+    },
   },
 ];
 

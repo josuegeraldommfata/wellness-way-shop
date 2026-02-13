@@ -1,161 +1,172 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, CheckCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
 
-export default function Cadastro() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+const Cadastro = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
-    if (password !== confirmPassword) {
-      setError("As senhas não coincidem");
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+      toast.error("Preencha todos os campos obrigatórios");
       return;
     }
 
-    if (password.length < 6) {
-      setError("A senha deve ter pelo menos 6 caracteres");
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("As senhas não coincidem");
       return;
     }
 
-    setLoading(true);
+    if (formData.password.length < 6) {
+      toast.error("A senha deve ter pelo menos 6 caracteres");
+      return;
+    }
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setIsLoading(true);
 
-    setLoading(false);
-    setSuccess(true);
+    try {
+      const result = await register(formData.name, formData.email, formData.password, formData.phone);
 
-    // Redirect to login after 2 seconds
-    setTimeout(() => {
-      navigate("/login");
-    }, 2000);
+      if (result.success) {
+        toast.success("Conta criada com sucesso!");
+        navigate("/");
+      } else {
+        toast.error(result.error || "Erro ao criar conta");
+      }
+    } catch (error) {
+      toast.error("Erro inesperado");
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  if (success) {
-    return (
-      <Layout>
-        <div className="min-h-[60vh] flex items-center justify-center py-12 px-4">
-          <Card className="w-full max-w-md">
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <CheckCircle className="h-16 w-16 text-accent mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-foreground mb-2">Cadastro realizado!</h2>
-                <p className="text-muted-foreground mb-4">
-                  Sua conta foi criada com sucesso. Você será redirecionado para a página de login.
-                </p>
-                <Link to="/login">
-                  <Button>Ir para Login</Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </Layout>
-    );
-  }
 
   return (
     <Layout>
-      <div className="min-h-[60vh] flex items-center justify-center py-12 px-4">
+      <div className="min-h-[60vh] flex items-center justify-center py-12">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-primary">Criar Conta</CardTitle>
-            <CardDescription>
-              Preencha os dados para se cadastrar
-            </CardDescription>
+            <CardTitle className="text-2xl">Criar conta</CardTitle>
+            <p className="text-muted-foreground">
+              Junte-se a nós e tenha acesso aos melhores produtos
+            </p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="name">Nome completo</Label>
+              <div>
+                <Label htmlFor="name">Nome completo *</Label>
                 <Input
                   id="name"
-                  type="text"
-                  placeholder="Seu nome"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
                   required
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+              <div>
+                <Label htmlFor="email">E-mail *</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
-                  placeholder="seu@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={formData.email}
+                  onChange={handleInputChange}
                   required
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
+              <div>
+                <Label htmlFor="phone">Telefone</Label>
                 <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="(11) 99999-9999"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmar senha</Label>
+              <div>
+                <Label htmlFor="password">Senha *</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="confirmPassword">Confirmar senha *</Label>
                 <Input
                   id="confirmPassword"
+                  name="confirmPassword"
                   type="password"
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
                   required
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Cadastrando...
-                  </>
-                ) : (
-                  "Criar conta"
-                )}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Criando conta..." : "Criar conta"}
               </Button>
+            </form>
 
-              <div className="text-center text-sm text-muted-foreground">
-                Já tem conta?{" "}
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Já tem uma conta?{" "}
                 <Link to="/login" className="text-primary hover:underline">
                   Fazer login
                 </Link>
-              </div>
-            </form>
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
     </Layout>
   );
-}
+};
+
+export default Cadastro;

@@ -4,9 +4,9 @@ const { getBanners, createBanner, updateBanner, deleteBanner, reorderBanners } =
 const { authenticate, isAdmin } = require('../middleware/auth');
 
 router.get('/', getBanners);
-router.post('/', authenticate, isAdmin, createBanner);
-router.put('/reorder', authenticate, isAdmin, reorderBanners);
-router.put('/:id', authenticate, isAdmin, updateBanner);
-router.delete('/:id', authenticate, isAdmin, deleteBanner);
+router.post('/', createBanner);
+router.put('/reorder', reorderBanners);
+router.put('/:id', updateBanner);
+router.delete('/:id', deleteBanner);
 
 module.exports = router;

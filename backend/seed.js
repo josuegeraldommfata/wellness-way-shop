@@ -1,10 +1,5 @@
 const sequelize = require('./database');
-<<<<<<< HEAD
-const Product = require('./models/Product');
-const User = require('./models/User');
-=======
 const bcrypt = require('bcryptjs');
->>>>>>> 70ab85a8481c702efc6abb426abf5bb27a8da4f1
 
 // Importar todos os modelos
 const User = require('./models/User');
@@ -157,7 +152,7 @@ const ordersData = [
   },
   {
     items: [{ productId: 2, productName: 'TG - 15mg (Indufar)', quantity: 2, price: 1800 }],
-    subtotal: 3600, discount: 0, total: 3600, status: 'processing', paymentMethod: 'stripe',
+    subtotal: 3600, discount: 0, total: 3600, status: 'paid', paymentMethod: 'stripe',
     userInfo: { name: 'João Santos', email: 'joao@email.com', phone: '(21) 98888-8888', address: 'Rua Copacabana, 500', city: 'Rio de Janeiro', state: 'RJ', cep: '22041-080' },
   },
   {
@@ -198,33 +193,9 @@ const seedDB = async () => {
     await sequelize.authenticate();
     console.log('PostgreSQL conectado');
 
-<<<<<<< HEAD
-    // Limpar dados existentes
-    await Product.destroy({ where: {} });
-    await User.destroy({ where: {} });
-    console.log('Dados existentes removidos');
-
-    // Inserir usuários de teste
-    await User.create({
-      email: 'admin@teste.com',
-      password: '123456',
-      role: 'admin',
-      name: 'Administrador'
-    });
-
-    await User.create({
-      email: 'cliente@teste.com',
-      password: '123456',
-      role: 'client',
-      name: 'Cliente Teste'
-    });
-
-    console.log('Usuários de teste inseridos');
-=======
     // Force sync (recria todas as tabelas)
     await sequelize.sync({ force: true });
     console.log('Tabelas recriadas');
->>>>>>> 70ab85a8481c702efc6abb426abf5bb27a8da4f1
 
     // 1. Usuários
     for (const userData of users) {

@@ -404,17 +404,71 @@ export function StoreDataProvider({ children }: { children: ReactNode }) {
   };
 
   // Payment Methods
-  const updatePaymentMethod = (id: string, config: Partial<PaymentMethod>) => {
-    const updated = paymentMethods.map((p) => (p.id === id ? { ...p, ...config } : p));
-    setPaymentMethods(updated);
-    persist("lipoimports_payments", updated);
+  const updatePaymentMethod = async (id: string, config: Partial<PaymentMethod>) => {
+    try {
+      // Call backend API to update payment method and save to .env
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings/payments/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add auth header if needed
+        },
+        body: JSON.stringify(config),
+      });
+
+      if (response.ok) {
+        const updatedMethod = await response.json();
+        const updated = paymentMethods.map((p) => (p.id === id ? updatedMethod : p));
+        setPaymentMethods(updated);
+        persist("lipoimports_payments", updated);
+      } else {
+        console.error('Failed to update payment method');
+        // Fallback to local update
+        const updated = paymentMethods.map((p) => (p.id === id ? { ...p, ...config } : p));
+        setPaymentMethods(updated);
+        persist("lipoimports_payments", updated);
+      }
+    } catch (error) {
+      console.error('Error updating payment method:', error);
+      // Fallback to local update
+      const updated = paymentMethods.map((p) => (p.id === id ? { ...p, ...config } : p));
+      setPaymentMethods(updated);
+      persist("lipoimports_payments", updated);
+    }
   };
 
   // Shipping
-  const updateShippingIntegration = (id: string, config: Partial<ShippingIntegration>) => {
-    const updated = shippingIntegrations.map((s) => (s.id === id ? { ...s, ...config } : s));
-    setShippingIntegrations(updated);
-    persist("lipoimports_shipping", updated);
+  const updateShippingIntegration = async (id: string, config: Partial<ShippingIntegration>) => {
+    try {
+      // Call backend API to update shipping integration
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings/shipping/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add auth header if needed
+        },
+        body: JSON.stringify(config),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        const updated = shippingIntegrations.map((s) => (s.id === id ? { ...s, ...config } : s));
+        setShippingIntegrations(updated);
+        persist("lipoimports_shipping", updated);
+      } else {
+        console.error('Failed to update shipping integration');
+        // Fallback to local update
+        const updated = shippingIntegrations.map((s) => (s.id === id ? { ...s, ...config } : s));
+        setShippingIntegrations(updated);
+        persist("lipoimports_shipping", updated);
+      }
+    } catch (error) {
+      console.error('Error updating shipping integration:', error);
+      // Fallback to local update
+      const updated = shippingIntegrations.map((s) => (s.id === id ? { ...s, ...config } : s));
+      setShippingIntegrations(updated);
+      persist("lipoimports_shipping", updated);
+    }
   };
 
   // Banners

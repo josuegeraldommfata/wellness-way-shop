@@ -3,11 +3,9 @@ const mercadopago = require('mercadopago');
 const paypal = require('paypal-rest-sdk');
 
 // Configurar Mercado Pago (só se houver token)
-if (process.env.MERCADO_PAGO_ACCESS_TOKEN && !process.env.MERCADO_PAGO_ACCESS_TOKEN.startsWith('dummy')) {
-  mercadopago.configure({
-    access_token: process.env.MERCADO_PAGO_ACCESS_TOKEN,
-  });
-}
+// if (process.env.MERCADO_PAGO_ACCESS_TOKEN && !process.env.MERCADO_PAGO_ACCESS_TOKEN.startsWith('dummy')) {
+//   mercadopago.configurations.setAccessToken(process.env.MERCADO_PAGO_ACCESS_TOKEN);
+// }
 
 // Configurar PayPal (só se houver credenciais)
 if (process.env.PAYPAL_CLIENT_ID && !process.env.PAYPAL_CLIENT_ID.startsWith('dummy')) {
@@ -58,7 +56,18 @@ const createStripeSession = async (req, res) => {
 // @route   POST /api/payments/mercadopago
 const createMercadoPagoPreference = async (req, res) => {
   try {
-    const { items, successUrl, failureUrl, pendingUrl } = req.body;
+    const { items, successUrl, failureUrl, pendingUrl, paymentMethod } = req.body;
+
+    // Configurar Mercado Pago se houver token
+    const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+    if (accessToken && !accessToken.startsWith('dummy')) {
+      mercadopago.configurations.setAccessToken(accessToken);
+    } else {
+      return res.status(400).json({
+        message: 'Mercado Pago não configurado. Configure o access token no painel admin.',
+        configured: false
+      });
+    }
 
     const preference = {
       items: items.map(item => ({
@@ -67,17 +76,29 @@ const createMercadoPagoPreference = async (req, res) => {
         quantity: item.quantity,
         currency_id: 'BRL',
       })),
-      payment_methods: { installments: 12, default_installments: 1 },
+      payment_methods: {
+        installments: 12,
+        default_installments: 1,
+        excluded_payment_methods: paymentMethod === 'pix' ? [] : [{ id: 'bolbradesco' }],
+        excluded_payment_types: paymentMethod === 'pix' ? [{ id: 'credit_card' }, { id: 'debit_card' }] : []
+      },
       back_urls: { success: successUrl, failure: failureUrl, pending: pendingUrl },
       auto_return: 'approved',
       external_reference: `order_${Date.now()}`,
     };
 
+    // Adicionar PIX se solicitado
+    if (paymentMethod === 'pix') {
+      preference.payment_methods.default_payment_method_id = 'pix';
+    }
+
     const response = await mercadopago.preferences.create(preference);
     res.json({
+      configured: true,
       preferenceId: response.body.id,
       url: response.body.init_point,
       sandbox_init_point: response.body.sandbox_init_point,
+      paymentMethod
     });
   } catch (error) {
     console.error('MercadoPago Error:', error.message);
@@ -149,5 +170,6 @@ const createPayPalOrder = async (req, res) => {
 module.exports = {
   createStripeSession,
   createMercadoPagoPreference,
+  createPagSeguroPayment,
   createPayPalOrder,
 };

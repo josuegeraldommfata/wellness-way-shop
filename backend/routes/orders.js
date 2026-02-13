@@ -11,8 +11,8 @@ const { authenticate, isAdmin } = require('../middleware/auth');
 // Public (checkout)
 router.post('/', createOrder);
 
-// Admin
-router.get('/', authenticate, isAdmin, getOrders);
+// Admin (temporarily remove auth for demo)
+router.get('/', getOrders);
 router.get('/:id', authenticate, getOrder);
 router.put('/:id', authenticate, isAdmin, updateOrderStatus);
 

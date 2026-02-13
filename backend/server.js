@@ -35,7 +35,6 @@ const videoRoutes = require('./routes/videos');
 const settingsRoutes = require('./routes/settings');
 const paymentRoutes = require('./routes/payments');
 const shippingRoutes = require('./routes/shipping');
-const settingsRoutes = require('./routes/settings');
 
 const app = express();
 
@@ -80,7 +79,6 @@ app.use('/api/videos', videoRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/shipping', shippingRoutes);
-app.use('/api/settings', settingsRoutes);
 
 // Rota para logs de atividade
 app.post('/api/logs', (req, res) => {

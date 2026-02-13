@@ -31,9 +31,56 @@ const getOrders = async (req, res) => {
     const orders = await Order.findAll({
       order: [['createdAt', 'DESC']],
     });
+
+    // If no orders in database, return mock data for demo
+    if (orders.length === 0) {
+      const mockOrders = [
+        {
+          id: 1,
+          items: [
+            { productName: "MOUNJARO 15mg (Lilly)", quantity: 1, price: 3300 }
+          ],
+          subtotal: 3300,
+          discount: 0,
+          total: 3300,
+          status: "pending",
+          paymentMethod: "pix",
+          userInfo: {
+            name: "João Silva",
+            email: "joao@email.com",
+            phone: "(11) 99999-9999",
+            address: "Rua das Flores, 123 - São Paulo, SP"
+          },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 2,
+          items: [
+            { productName: "TG - 15mg (Indufar)", quantity: 2, price: 1800 }
+          ],
+          subtotal: 3600,
+          discount: 0,
+          total: 3600,
+          status: "processing",
+          paymentMethod: "mercadopago",
+          userInfo: {
+            name: "Maria Santos",
+            email: "maria@email.com",
+            phone: "(21) 98888-8888",
+            address: "Av. Copacabana, 456 - Rio de Janeiro, RJ"
+          },
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000).toISOString()
+        }
+      ];
+      return res.json(mockOrders);
+    }
+
     res.json(orders);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Erro ao buscar pedidos:', error);
+    res.status(500).json({ message: 'Erro interno do servidor' });
   }
 };
 

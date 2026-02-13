@@ -13,6 +13,9 @@ router.post('/stripe', createStripeSession);
 // Mercado Pago
 router.post('/mercadopago', createMercadoPagoPreference);
 
+// PagSeguro
+router.post('/pagseguro', createPagSeguroPayment);
+
 // PayPal
 router.post('/paypal', createPayPalOrder);
 

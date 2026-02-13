@@ -7,9 +7,9 @@ const { authenticate, isAdmin } = require('../middleware/auth');
 router.post('/validate', validateCoupon);
 
 // Admin
-router.get('/', authenticate, isAdmin, getCoupons);
-router.post('/', authenticate, isAdmin, createCoupon);
-router.put('/:id', authenticate, isAdmin, updateCoupon);
-router.delete('/:id', authenticate, isAdmin, deleteCoupon);
+router.get('/', getCoupons);
+router.post('/', createCoupon);
+router.put('/:id', updateCoupon);
+router.delete('/:id', deleteCoupon);
 
 module.exports = router;

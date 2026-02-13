@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import heroBanner from "@/assets/hero-banner.jpg";
 
 export function HeroSection() {
-  const { banners } = useStoreData();
+  const { banners, loadingBanners } = useStoreData();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const activeBanners = banners

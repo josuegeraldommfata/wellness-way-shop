@@ -1,11 +1,44 @@
 import { useState } from "react";
-import { Play } from "lucide-react";
+import { Play, X } from "lucide-react";
 import { useStoreData } from "@/contexts/StoreDataContext";
 import { Badge } from "@/components/ui/badge";
 
+function getYoutubeEmbedUrl(url: string): string | null {
+  if (!url) return null;
+  // Handle youtube.com/watch?v=ID
+  const watchMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+  if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}?autoplay=1`;
+  // Handle youtube.com/shorts/ID
+  const shortsMatch = url.match(/youtube\.com\/shorts\/([\w-]+)/);
+  if (shortsMatch) return `https://www.youtube.com/embed/${shortsMatch[1]}?autoplay=1`;
+  return null;
+}
+
 export function VideoFeedbackSection() {
-  const { videoTestimonials } = useStoreData();
-  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const { videoTestimonials, loadingVideos } = useStoreData();
+  const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
+
+  if (loadingVideos) {
+    return (
+      <section className="py-16 bg-primary">
+        <div className="container-custom">
+          <div className="text-center mb-10">
+            <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-0">
+              VIDEOS DE CLIENTES
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground">
+              Feedback dos nossos clientes
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse aspect-[9/16] bg-white/10 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (videoTestimonials.length === 0) {
     return null;
@@ -16,13 +49,13 @@ export function VideoFeedbackSection() {
       <div className="container-custom">
         <div className="text-center mb-10">
           <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-0">
-            VÍDEOS DE CLIENTES
+            VIDEOS DE CLIENTES
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground">
             Feedback dos nossos clientes
           </h2>
           <p className="text-primary-foreground/80 mt-2">
-            Veja o que nossos clientes estão dizendo sobre seus pedidos
+            Veja o que nossos clientes dizem sobre seus pedidos
           </p>
         </div>
 
@@ -32,7 +65,10 @@ export function VideoFeedbackSection() {
             <div
               key={video.id}
               className="group relative aspect-[9/16] rounded-xl overflow-hidden cursor-pointer bg-black/20"
-              onClick={() => setSelectedVideo(video.id)}
+              onClick={() => {
+                const embedUrl = getYoutubeEmbedUrl(video.videoUrl);
+                setSelectedVideoUrl(embedUrl || video.videoUrl);
+              }}
             >
               {/* Thumbnail */}
               <img
@@ -62,21 +98,34 @@ export function VideoFeedbackSection() {
           ))}
         </div>
 
-        {/* Video modal placeholder */}
-        {selectedVideo && (
+        {/* Video modal */}
+        {selectedVideoUrl && (
           <div
             className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
-            onClick={() => setSelectedVideo(null)}
+            onClick={() => setSelectedVideoUrl(null)}
           >
-            <div className="bg-background rounded-xl p-6 max-w-lg w-full text-center">
-              <h3 className="text-lg font-semibold mb-4">Vídeo em breve!</h3>
-              <p className="text-muted-foreground mb-4">
-                Esta é uma área preparada para você adicionar seus vídeos de clientes reais.
-                Clique para fechar.
-              </p>
-              <p className="text-sm text-primary">
-                Dica: Adicione vídeos no painel admin em Vídeos.
-              </p>
+            <div className="relative max-w-2xl w-full aspect-video" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => setSelectedVideoUrl(null)}
+                className="absolute -top-10 right-0 text-white hover:text-white/80"
+              >
+                <X className="h-8 w-8" />
+              </button>
+              {selectedVideoUrl.includes("youtube.com/embed") ? (
+                <iframe
+                  src={selectedVideoUrl}
+                  className="w-full h-full rounded-xl"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  src={selectedVideoUrl}
+                  className="w-full h-full rounded-xl"
+                  controls
+                  autoPlay
+                />
+              )}
             </div>
           </div>
         )}

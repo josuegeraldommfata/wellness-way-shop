@@ -13,7 +13,7 @@ import { ImageUpload } from "@/components/admin/ImageUpload";
 import { ColorPicker } from "@/components/admin/ColorPicker";
 
 export default function AdminAparencia() {
-  const { settings, updateSettings, resetSettings } = useSiteSettings();
+  const { settings, updateSettings, saveSettingsToAPI, resetSettings } = useSiteSettings();
   const [localSettings, setLocalSettings] = useState(settings);
 
   const handleChange = (key: keyof typeof settings, value: string) => {
@@ -38,9 +38,10 @@ export default function AdminAparencia() {
     setLocalSettings((prev) => ({ ...prev, navbarLinks: newLinks }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     updateSettings(localSettings);
-    toast.success("Configurações salvas com sucesso!");
+    await saveSettingsToAPI();
+    toast.success("Configuracoes salvas com sucesso!");
   };
 
   const handleReset = () => {

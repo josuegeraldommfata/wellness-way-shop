@@ -94,7 +94,7 @@ export default function AdminCategorias() {
     setSubCategoryDialogOpen(true);
   };
 
-  const handleSaveCategory = () => {
+  const handleSaveCategory = async () => {
     if (!categoryForm.name) {
       toast.error("Nome é obrigatório");
       return;
@@ -103,15 +103,18 @@ export default function AdminCategorias() {
     const slug = categoryForm.slug || generateSlug(categoryForm.name);
     const image = categoryForm.image || "/placeholder.svg";
 
-    if (editingCategory) {
-      updateCategory(editingCategory.id, { ...categoryForm, slug, image });
-      toast.success("Categoria atualizada!");
-    } else {
-      addCategory({ ...categoryForm, slug, image });
-      toast.success("Categoria criada!");
+    try {
+      if (editingCategory) {
+        await updateCategory(editingCategory.id, { ...categoryForm, slug, image });
+        toast.success("Categoria atualizada!");
+      } else {
+        await addCategory({ ...categoryForm, slug, image });
+        toast.success("Categoria criada!");
+      }
+      setCategoryDialogOpen(false);
+    } catch (error) {
+      toast.error("Erro ao salvar categoria");
     }
-
-    setCategoryDialogOpen(false);
   };
 
   const handleSaveSubCategory = () => {
@@ -133,10 +136,14 @@ export default function AdminCategorias() {
     setSubCategoryDialogOpen(false);
   };
 
-  const handleDeleteCategory = (id: string) => {
+  const handleDeleteCategory = async (id: string) => {
     if (confirm("Tem certeza que deseja excluir esta categoria?")) {
-      deleteCategory(id);
-      toast.success("Categoria excluída!");
+      try {
+        await deleteCategory(id);
+        toast.success("Categoria excluída!");
+      } catch (error) {
+        toast.error("Erro ao excluir categoria");
+      }
     }
   };
 

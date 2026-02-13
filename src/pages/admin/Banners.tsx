@@ -68,33 +68,44 @@ export default function AdminBanners() {
     setDialogOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.title || !form.image) {
       toast.error("Preencha o título e adicione uma imagem");
       return;
     }
 
-    if (editingBanner) {
-      updateBanner(editingBanner.id, form);
-      toast.success("Banner atualizado!");
-    } else {
-      addBanner(form);
-      toast.success("Banner criado!");
+    try {
+      if (editingBanner) {
+        await updateBanner(editingBanner.id, form);
+        toast.success("Banner atualizado!");
+      } else {
+        await addBanner(form);
+        toast.success("Banner criado!");
+      }
+      setDialogOpen(false);
+    } catch (error) {
+      toast.error("Erro ao salvar banner");
     }
-
-    setDialogOpen(false);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm("Tem certeza que deseja excluir este banner?")) {
-      deleteBanner(id);
-      toast.success("Banner excluído!");
+      try {
+        await deleteBanner(id);
+        toast.success("Banner excluído!");
+      } catch (error) {
+        toast.error("Erro ao excluir banner");
+      }
     }
   };
 
-  const handleToggleActive = (id: string, isActive: boolean) => {
-    updateBanner(id, { isActive });
-    toast.success(isActive ? "Banner ativado!" : "Banner desativado!");
+  const handleToggleActive = async (id: string, isActive: boolean) => {
+    try {
+      await updateBanner(id, { isActive });
+      toast.success(isActive ? "Banner ativado!" : "Banner desativado!");
+    } catch (error) {
+      toast.error("Erro ao atualizar banner");
+    }
   };
 
   const sortedBanners = [...banners].sort((a, b) => a.order - b.order);

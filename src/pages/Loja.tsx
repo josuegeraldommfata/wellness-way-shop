@@ -1,82 +1,19 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Filter, X } from "lucide-react";
-import { toast } from "sonner";
-
-interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  shortDescription: string;
-  price: number;
-  originalPrice?: number;
-  installments: number;
-  installmentPrice: number;
-  images: string[];
-  category: string;
-  brand: string;
-  inStock: boolean;
-  isFeatured: boolean;
-  isBestSeller: boolean;
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  image: string;
-}
+import { useStoreData } from "@/contexts/StoreDataContext";
 
 const Loja = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { products, categories, loadingProducts } = useStoreData();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
   const selectedCategory = searchParams.get("categoria") || "";
-
-  useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-  }, []);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/products');
-      const data = await response.json();
-      setProducts(data);
-    } catch (error) {
-      toast.error('Erro ao carregar produtos');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/categories');
-      const data = await response.json();
-      setCategories(data);
-    } catch (error) {
-      // Categories might not be implemented yet, use mock
-      setCategories([
-        { id: '1', name: 'Canetas Emagrecedoras', slug: 'canetas-emagrecedoras', description: '', image: '' },
-        { id: '2', name: 'Vitaminas', slug: 'vitaminas', description: '', image: '' },
-        { id: '3', name: 'Suplementos', slug: 'suplementos', description: '', image: '' },
-      ]);
-    }
-  };
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -101,7 +38,7 @@ const Loja = () => {
     setSearchParams(searchParams);
   };
 
-  if (loading) {
+  if (loadingProducts) {
     return (
       <Layout>
         <div className="min-h-[50vh] flex items-center justify-center">
@@ -122,7 +59,7 @@ const Loja = () => {
             Nossa Loja
           </h1>
           <p className="text-muted-foreground mt-2">
-            Encontre os melhores produtos para sua saúde
+            Encontre os melhores produtos para sua saude
           </p>
         </div>
       </div>

@@ -53,27 +53,34 @@ export default function AdminVideos() {
     setDialogOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.title || !form.thumbnailUrl) {
       toast.error("Título e thumbnail são obrigatórios");
       return;
     }
 
-    if (editingVideo) {
-      updateVideo(editingVideo.id, form);
-      toast.success("Vídeo atualizado!");
-    } else {
-      addVideo(form);
-      toast.success("Vídeo adicionado!");
+    try {
+      if (editingVideo) {
+        await updateVideo(editingVideo.id, form);
+        toast.success("Vídeo atualizado!");
+      } else {
+        await addVideo(form);
+        toast.success("Vídeo adicionado!");
+      }
+      setDialogOpen(false);
+    } catch (error) {
+      toast.error("Erro ao salvar vídeo");
     }
-
-    setDialogOpen(false);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm("Tem certeza que deseja excluir este vídeo?")) {
-      deleteVideo(id);
-      toast.success("Vídeo excluído!");
+      try {
+        await deleteVideo(id);
+        toast.success("Vídeo excluído!");
+      } catch (error) {
+        toast.error("Erro ao excluir vídeo");
+      }
     }
   };
 

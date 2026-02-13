@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/table";
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import { toast } from "sonner";
+import { getAuthHeaders } from "@/contexts/AuthContext";
 
 export default function AdminProdutos() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -78,10 +79,15 @@ export default function AdminProdutos() {
   };
 
   const fetchCategories = async () => {
-    // Mock categories for now, you can add API later
-    setCategories([
-      { id: '1', name: 'Canetas Emagrecedoras', slug: 'canetas-emagrecedoras' },
-    ]);
+    try {
+      const response = await fetch('http://localhost:5000/api/categories');
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar categorias');
+    }
   };
 
   const generateSlug = (name: string) => {
@@ -155,14 +161,14 @@ export default function AdminProdutos() {
       if (editingProduct) {
         await fetch(`http://localhost:5000/api/products/${editingProduct.id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify(productData),
         });
         toast.success("Produto atualizado!");
       } else {
         await fetch('http://localhost:5000/api/products', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify(productData),
         });
         toast.success("Produto criado!");

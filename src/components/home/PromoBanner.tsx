@@ -1,7 +1,11 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
 export function PromoBanner() {
+  const { settings } = useSiteSettings();
+  const phoneNumber = settings.footerPhone.replace(/\D/g, "");
+
   return (
     <section className="py-8">
       <div className="container-custom">
@@ -32,7 +36,7 @@ export function PromoBanner() {
                 Grupo de Clientes e Indicações
               </h3>
               <Button variant="secondary" size="default" className="mt-4" asChild>
-                <a href="https://wa.me/5583993396445" target="_blank" rel="noopener noreferrer">
+                <a href={`https://wa.me/55${phoneNumber}`} target="_blank" rel="noopener noreferrer">
                   Quero participar
                 </a>
               </Button>

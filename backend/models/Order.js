@@ -7,40 +7,65 @@ const Order = sequelize.define('Order', {
     primaryKey: true,
     autoIncrement: true,
   },
+
   items: {
-    type: DataTypes.JSON, // Array de objetos
+    type: DataTypes.JSONB, // Melhor para PostgreSQL
     allowNull: false,
   },
+
   subtotal: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
   },
+
   discount: {
     type: DataTypes.DECIMAL(10, 2),
     defaultValue: 0,
   },
+
   total: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
   },
+
   status: {
-    type: DataTypes.ENUM('pending', 'paid', 'shipped', 'delivered', 'cancelled'),
+    type: DataTypes.ENUM(
+      'pending',
+      'paid',
+      'shipped',
+      'delivered',
+      'cancelled'
+    ),
     defaultValue: 'pending',
   },
+
+  // 🔥 CORRIGIDO AQUI
   paymentMethod: {
-    type: DataTypes.ENUM('stripe', 'mercadopago', 'pagseguro', 'paypal'),
-    allowNull: false,
-  },
+  type: DataTypes.ENUM(
+    'stripe',
+    'mercadopago',
+    'pagseguro',
+    'paypal',
+    'pix',
+    'credit_card',
+    'boleto'
+  ),
+  allowNull: false,
+},
+
   paymentId: {
     type: DataTypes.STRING,
   },
+
   userInfo: {
-    type: DataTypes.JSON, // Objeto com name, email, etc.
+    type: DataTypes.JSONB,
     allowNull: false,
   },
+
   coupon: {
-    type: DataTypes.JSON, // Objeto com code, discount
+    type: DataTypes.JSONB,
   },
+
 }, {
   timestamps: true,
 });

@@ -1,11 +1,45 @@
+import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
 const Contato = () => {
+  const { settings } = useSiteSettings();
+  const [formData, setFormData] = useState({
+    nome: "",
+    email: "",
+    telefone: "",
+    assunto: "",
+    mensagem: ""
+  });
+
+  // Remove all non-digits from phone number
+  const phoneNumber = settings.footerPhone.replace(/\D/g, "");
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Build WhatsApp message
+    const mensagem = `*Nova mensagem do site:*%0A%0A` +
+      `*Nome:* ${formData.nome}%0A` +
+      `*Email:* ${formData.email}%0A` +
+      `*Telefone:* ${formData.telefone || "Não informado"}%0A` +
+      `*Assunto:* ${formData.assunto}%0A%0A` +
+      `*Mensagem:*%0A${formData.mensagem}`;
+
+    // Redirect to WhatsApp
+    window.open(`https://wa.me/55${phoneNumber}?text=${mensagem}`, "_blank");
+  };
+
   return (
     <Layout>
       {/* Hero */}
@@ -25,24 +59,48 @@ const Contato = () => {
             <h2 className="text-2xl font-bold text-foreground mb-6">
               Envie uma mensagem
             </h2>
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="nome">Nome *</Label>
-                  <Input id="nome" placeholder="Seu nome" required />
+                  <Input
+                    id="nome"
+                    placeholder="Seu nome"
+                    required
+                    value={formData.nome}
+                    onChange={handleInputChange}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email *</Label>
-                  <Input id="email" type="email" placeholder="seu@email.com" required />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="telefone">Telefone</Label>
-                <Input id="telefone" placeholder="(00) 00000-0000" />
+                <Input
+                  id="telefone"
+                  placeholder="(00) 00000-0000"
+                  value={formData.telefone}
+                  onChange={handleInputChange}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="assunto">Assunto *</Label>
-                <Input id="assunto" placeholder="Como podemos ajudar?" required />
+                <Input
+                  id="assunto"
+                  placeholder="Como podemos ajudar?"
+                  required
+                  value={formData.assunto}
+                  onChange={handleInputChange}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="mensagem">Mensagem *</Label>
@@ -51,14 +109,17 @@ const Contato = () => {
                   placeholder="Descreva sua dúvida ou solicitação..."
                   rows={5}
                   required
+                  value={formData.mensagem}
+                  onChange={handleInputChange}
                 />
               </div>
               <Button type="submit" size="lg">
-                Enviar mensagem
+                <MessageCircle className="h-5 w-5 mr-2" />
+                Enviar mensagem via WhatsApp
               </Button>
             </form>
             <p className="text-sm text-muted-foreground mt-4">
-              * Este formulário é apenas demonstrativo. Para contato real, use o WhatsApp.
+              * Sua mensagem será enviada diretamente para nosso WhatsApp.
             </p>
           </div>
 
@@ -71,7 +132,7 @@ const Contato = () => {
             <div className="space-y-6">
               {/* WhatsApp - Main CTA */}
               <a
-                href="https://wa.me/5583993396445"
+                href={`https://wa.me/55${phoneNumber}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block p-6 bg-accent/10 border-2 border-accent rounded-xl hover:bg-accent/20 transition-colors"
@@ -82,7 +143,7 @@ const Contato = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-accent text-lg">WhatsApp</h3>
-                    <p className="text-foreground font-medium">(83) 99339-6445</p>
+                    <p className="text-foreground font-medium">{settings.footerPhone}</p>
                     <p className="text-sm text-muted-foreground mt-1">
                       Atendimento rápido e personalizado
                     </p>
@@ -98,7 +159,7 @@ const Contato = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold">Telefone</h3>
-                    <p className="text-muted-foreground">(83) 99339-6445</p>
+                    <p className="text-muted-foreground">{settings.footerPhone}</p>
                   </div>
                 </div>
 
@@ -108,7 +169,9 @@ const Contato = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold">Email</h3>
-                    <p className="text-muted-foreground">contato@lipoimports.com.br</p>
+                    <a href={`mailto:${settings.footerEmail}`} className="text-muted-foreground hover:underline">
+                      {settings.footerEmail}
+                    </a>
                   </div>
                 </div>
 

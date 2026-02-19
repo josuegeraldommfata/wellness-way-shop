@@ -8,6 +8,9 @@
     <meta name="description" content="Loja online de produtos importados para bem-estar e saúde" />
     <meta name="author" content="LipoImports" />
 
+    <!-- Dynamic Favicon -->
+    <link id="dynamic-favicon" rel="icon" type="image/x-icon" href="/favicon.ico" />
+
     <meta property="og:title" content="E-commerce" />
     <meta property="og:description" content="Loja online de produtos importados para bem-estar e saúde" />
     <meta property="og:type" content="website" />
@@ -16,6 +19,28 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@lipoimports" />
     <meta name="twitter:image" content="/placeholder.svg" />
+
+    <!-- Script to load favicon from settings -->
+    <script>
+      (async function() {
+        try {
+          const API_URL = 'http://localhost:5000';
+          const response = await fetch(API_URL + '/api/settings');
+          if (response.ok) {
+            const settings = await response.json();
+            if (settings.faviconUrl) {
+              const faviconLink = document.getElementById('dynamic-favicon');
+              faviconLink.href = settings.faviconUrl;
+            }
+            if (settings.siteName) {
+              document.title = settings.siteName;
+            }
+          }
+        } catch (e) {
+          console.log('Could not load settings for favicon:', e);
+        }
+      })();
+    </script>
   </head>
 
   <body>

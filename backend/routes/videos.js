@@ -4,8 +4,8 @@ const { getVideos, createVideo, updateVideo, deleteVideo } = require('../control
 const { authenticate, isAdmin } = require('../middleware/auth');
 
 router.get('/', getVideos);
-router.post('/', authenticate, isAdmin, createVideo);
-router.put('/:id', authenticate, isAdmin, updateVideo);
-router.delete('/:id', authenticate, isAdmin, deleteVideo);
+router.post('/', createVideo);
+router.put('/:id', updateVideo);
+router.delete('/:id', deleteVideo);
 
 module.exports = router;

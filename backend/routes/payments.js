@@ -11,7 +11,7 @@ const {
 router.post('/stripe', createStripeSession);
 
 // Mercado Pago
-router.post('/mercadopago', createMercadoPagoPreference);
+router.post('/mercadopago/pix', createMercadoPagoPreference);
 
 // PagSeguro
 router.post('/pagseguro', createPagSeguroPayment);

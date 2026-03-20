@@ -9,12 +9,13 @@ export interface User {
   role: "customer" | "admin";
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (name: string, email: string, password: string, phone?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
@@ -78,6 +79,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const register = async (name: string, email: string, password: string, phone?: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, phone }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const userData: User = {
+          id: String(data.user?.id || data.id),
+          email: data.user?.email || email,
+          name: data.user?.name || name,
+          role: 'customer',
+        };
+        const authToken = data.token;
+        setUser(userData);
+        setToken(authToken);
+        localStorage.setItem("lipoimports_user", JSON.stringify(userData));
+        if (authToken) localStorage.setItem("lipoimports_token", authToken);
+        return { success: true };
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        return { success: false, error: errorData.message || "Erro ao criar conta" };
+      }
+    } catch {
+      return { success: false, error: "Erro ao conectar com o servidor" };
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -93,6 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         isAdmin: user?.role === "admin",
         login,
+        register,
         logout,
       }}
     >

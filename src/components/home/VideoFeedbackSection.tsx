@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { Play, X } from "lucide-react";
 import { useStoreData } from "@/contexts/StoreDataContext";
-import { Badge } from "@/components/ui/badge";
 
 function getYoutubeEmbedUrl(url: string): string | null {
   if (!url) return null;
-  // Handle youtube.com/watch?v=ID
   const watchMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
   if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}?autoplay=1`;
-  // Handle youtube.com/shorts/ID
   const shortsMatch = url.match(/youtube\.com\/shorts\/([\w-]+)/);
   if (shortsMatch) return `https://www.youtube.com/embed/${shortsMatch[1]}?autoplay=1`;
   return null;
@@ -18,81 +15,44 @@ export function VideoFeedbackSection() {
   const { videoTestimonials, loadingVideos } = useStoreData();
   const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
 
-  if (loadingVideos) {
-    return (
-      <section className="py-16 bg-primary">
-        <div className="container-custom">
-          <div className="text-center mb-10">
-            <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-0">
-              VIDEOS DE CLIENTES
-            </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground">
-              Feedback dos nossos clientes
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse aspect-[9/16] bg-white/10 rounded-xl" />
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (videoTestimonials.length === 0) {
-    return null;
-  }
+  if (loadingVideos || videoTestimonials.length === 0) return null;
 
   return (
-    <section className="py-16 bg-primary">
+    <section className="py-12 bg-muted/50">
       <div className="container-custom">
-        <div className="text-center mb-10">
-          <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-0">
-            VIDEOS DE CLIENTES
-          </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground">
-            Feedback dos nossos clientes
+        <div className="text-center mb-8">
+          <h2 className="text-xl md:text-2xl font-bold text-foreground">
+            Vídeos dos nossos clientes
           </h2>
-          <p className="text-primary-foreground/80 mt-2">
-            Veja o que nossos clientes dizem sobre seus pedidos
+          <p className="text-sm text-muted-foreground mt-1">
+            Veja o que dizem sobre seus pedidos
           </p>
         </div>
 
-        {/* Video grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {videoTestimonials.map((video) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {videoTestimonials.slice(0, 6).map((video) => (
             <div
               key={video.id}
-              className="group relative aspect-[9/16] rounded-xl overflow-hidden cursor-pointer bg-black/20"
+              className="group relative aspect-[9/16] rounded-lg overflow-hidden cursor-pointer bg-muted"
               onClick={() => {
                 const embedUrl = getYoutubeEmbedUrl(video.videoUrl);
                 setSelectedVideoUrl(embedUrl || video.videoUrl);
               }}
             >
-              {/* Thumbnail */}
               <img
                 src={video.thumbnailUrl}
                 alt={video.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
-              
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
-              
-              {/* Play button */}
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Play className="h-8 w-8 text-primary ml-1" fill="currentColor" />
+                <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center group-hover:scale-110 transition-transform shadow-md">
+                  <Play className="h-5 w-5 text-primary ml-0.5" fill="currentColor" />
                 </div>
               </div>
-
-              {/* Duration badge */}
-              <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center text-white text-sm">
-                <span className="font-medium">{video.author}</span>
-                <span className="bg-black/50 px-2 py-1 rounded text-xs">
-                  {video.duration}
-                </span>
+              <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center text-white text-[10px]">
+                <span className="font-medium truncate">{video.author}</span>
+                <span className="bg-black/50 px-1.5 py-0.5 rounded">{video.duration}</span>
               </div>
             </div>
           ))}
@@ -119,12 +79,7 @@ export function VideoFeedbackSection() {
                   allowFullScreen
                 />
               ) : (
-                <video
-                  src={selectedVideoUrl}
-                  className="w-full h-full rounded-xl"
-                  controls
-                  autoPlay
-                />
+                <video src={selectedVideoUrl} className="w-full h-full rounded-xl" controls autoPlay />
               )}
             </div>
           </div>

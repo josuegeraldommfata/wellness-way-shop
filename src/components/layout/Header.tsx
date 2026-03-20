@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Search, ShoppingCart, User, Menu, X, Phone } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Search, ShoppingCart, User, Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -12,38 +12,48 @@ import { formatPrice } from "@/data/mockData";
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { settings } = useSiteSettings();
   const { isAuthenticated, isAdmin, user } = useAuth();
   const { totalItems, subtotal } = useCart();
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/loja?busca=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
+      setMobileMenuOpen(false);
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full">
+    <header className="sticky top-0 z-50 w-full bg-background shadow-sm">
       {/* Top bar */}
-      <div className="bg-primary">
-        <div className="container-custom flex h-10 items-center justify-between text-sm text-primary-foreground">
-          <span className="hidden sm:inline">{settings.topBarText}</span>
-          <div className="flex items-center gap-4 ml-auto">
+      <div className="bg-foreground text-background">
+        <div className="container-custom flex h-8 items-center justify-between text-xs">
+          <span className="hidden sm:inline opacity-80">{settings.topBarText}</span>
+          <div className="flex items-center gap-3 ml-auto">
             {isAuthenticated ? (
               <>
                 {isAdmin && (
-                  <Link to="/admin" className="hover:underline transition-colors">
-                    Admin
+                  <Link to="/admin" className="hover:underline opacity-80 hover:opacity-100 transition-opacity">
+                    Painel Admin
                   </Link>
                 )}
-                <span className="hidden sm:inline">|</span>
-                <Link to="/conta" className="hover:underline transition-colors">
+                <Link to="/conta" className="hover:underline opacity-80 hover:opacity-100 transition-opacity">
                   Olá, {user?.name.split(" ")[0]}
                 </Link>
               </>
             ) : (
               <>
-                <Link to="/login" className="hover:underline transition-colors">
+                <Link to="/login" className="hover:underline opacity-80 hover:opacity-100 transition-opacity">
                   Entrar
                 </Link>
-                <span className="hidden sm:inline">|</span>
-                <Link to="/cadastro" className="hover:underline transition-colors">
-                  Cadastrar
+                <span className="opacity-40">|</span>
+                <Link to="/cadastro" className="hover:underline opacity-80 hover:opacity-100 transition-opacity">
+                  Criar conta
                 </Link>
               </>
             )}
@@ -52,142 +62,143 @@ export function Header() {
       </div>
 
       {/* Main header */}
-      <div className="bg-background border-b border-border shadow-sm">
-        <div className="container-custom flex h-20 items-center justify-between gap-4">
+      <div className="border-b border-border">
+        <div className="container-custom flex h-16 items-center gap-4">
+          {/* Mobile menu toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden shrink-0"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 shrink-0">
+          <Link to="/" className="flex items-center shrink-0">
             {settings.logoUrl ? (
-              <img src={settings.logoUrl} alt={settings.siteName} className="h-12" />
+              <img src={settings.logoUrl} alt={settings.siteName} className="h-10 max-w-[160px] object-contain" />
             ) : (
-              <div className="flex flex-col">
-                <span className="text-2xl font-bold text-primary">
-                  {settings.siteName.split("Imports")[0] || "Lipo"}
-                </span>
-                <span className="text-xs text-muted-foreground -mt-1">Imports</span>
-              </div>
+              <span className="text-xl font-bold text-primary">{settings.siteName}</span>
             )}
           </Link>
 
           {/* Search bar - desktop */}
-          <div className="hidden md:flex flex-1 max-w-xl mx-8">
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl mx-4">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Pesquisar produtos..."
+                placeholder="O que você está procurando?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 h-11 rounded-full border-2 border-border focus:border-primary"
+                className="pr-10 h-10 rounded-full border-border bg-muted/50 focus:bg-background"
               />
+              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors">
+                <Search className="h-4 w-4" />
+              </button>
             </div>
-          </div>
+          </form>
 
-          {/* Right side actions */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          {/* Right actions */}
+          <div className="flex items-center gap-1 ml-auto shrink-0">
+            {/* Search toggle mobile */}
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setSearchOpen(!searchOpen)}>
+              <Search className="h-5 w-5" />
+            </Button>
+
+            {/* Account */}
+            <Button variant="ghost" size="icon" className="hidden sm:flex" asChild>
+              <Link to={isAuthenticated ? "/conta" : "/login"}>
+                <User className="h-5 w-5" />
+              </Link>
+            </Button>
+
             {/* Cart */}
-            <Link to="/carrinho" className="relative flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="relative">
+            <Link to="/carrinho" className="relative flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors">
+              <div className="relative">
                 <ShoppingCart className="h-5 w-5" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center font-semibold">
+                  <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-bold">
                     {totalItems}
                   </span>
                 )}
-              </Button>
+              </div>
               <span className="hidden sm:block text-sm font-medium">{formatPrice(subtotal)}</span>
             </Link>
-
-            {/* Mobile menu button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
           </div>
         </div>
+      </div>
 
-        {/* Navigation - desktop */}
-        <nav className="hidden md:block bg-primary">
-          <div className="container-custom">
-            <ul className="flex items-center justify-center gap-1">
+      {/* Category navigation - desktop */}
+      <nav className="hidden md:block border-b border-border bg-background">
+        <div className="container-custom">
+          <ul className="flex items-center gap-0 overflow-x-auto">
+            {settings.navbarLinks.map((item) => (
+              <li key={item.name}>
+                <Link
+                  to={item.href}
+                  className={cn(
+                    "block px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-primary border-b-2 border-transparent hover:border-primary transition-all whitespace-nowrap",
+                    location.pathname + location.search === item.href && "text-primary border-primary"
+                  )}
+                >
+                  {item.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
+
+      {/* Mobile search */}
+      {searchOpen && (
+        <div className="md:hidden border-b border-border p-3 bg-background animate-fade-in">
+          <form onSubmit={handleSearch} className="relative">
+            <Input
+              type="search"
+              placeholder="Buscar produtos..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pr-10 rounded-full"
+              autoFocus
+            />
+            <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <Search className="h-4 w-4" />
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Mobile menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-background border-b border-border animate-fade-in">
+          <nav className="container-custom py-3">
+            <ul className="space-y-0.5">
               {settings.navbarLinks.map((item) => (
                 <li key={item.name}>
                   <Link
                     to={item.href}
                     className={cn(
-                      "block px-4 py-3 text-sm font-medium text-primary-foreground hover:bg-white/10 transition-colors",
-                      location.pathname + location.search === item.href && "bg-white/20"
+                      "block px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-muted transition-colors",
+                      location.pathname + location.search === item.href && "text-primary bg-primary/5"
                     )}
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-              <li className="ml-auto flex items-center gap-2 text-primary-foreground text-sm">
-                <Phone className="h-4 w-4" />
-                <span>Compre pelo WhatsApp: {settings.footerPhone}</span>
-              </li>
-            </ul>
-          </div>
-        </nav>
-      </div>
-
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-background border-b border-border animate-slide-up">
-          {/* Mobile search */}
-          <div className="p-4 border-b border-border">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Pesquisar produtos..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 h-11 rounded-full"
-              />
-            </div>
-          </div>
-
-          {/* Mobile navigation */}
-          <nav className="p-4">
-            <ul className="space-y-1">
-              {settings.navbarLinks.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    to={item.href}
-                    className="block px-4 py-3 text-sm font-medium rounded-lg hover:bg-muted transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.name}
                   </Link>
                 </li>
               ))}
-              {isAdmin && (
-                <li>
+              {!isAuthenticated && (
+                <li className="pt-3 border-t border-border mt-3">
                   <Link
-                    to="/admin"
-                    className="block px-4 py-3 text-sm font-medium rounded-lg hover:bg-muted transition-colors text-primary"
+                    to="/login"
+                    className="block px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-muted"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Painel Admin
+                    Entrar / Criar conta
                   </Link>
                 </li>
               )}
-              <li className="pt-4 border-t border-border mt-4">
-                <a
-                  href={`https://wa.me/55${settings.footerPhone.replace(/\D/g, "")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-accent rounded-lg hover:bg-accent/10 transition-colors"
-                >
-                  <Phone className="h-4 w-4" />
-                  <span>WhatsApp: {settings.footerPhone}</span>
-                </a>
-              </li>
             </ul>
           </nav>
         </div>

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, ShoppingCart, Eye } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Product, formatPrice } from "@/data/mockData";
 import { useCart } from "@/contexts/CartContext";
@@ -12,59 +12,81 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     addToCart(product, 1);
     toast.success(`${product.name} adicionado ao carrinho!`);
   };
 
+  const discount = product.originalPrice
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : 0;
+
   return (
-    <div className="group bg-card rounded-xl border border-border overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
-      {/* Image container */}
-      <Link to={`/produto/${product.slug}`} className="block relative aspect-square overflow-hidden bg-secondary/30">
+    <Link
+      to={`/produto/${product.slug}`}
+      className="group block bg-card rounded-lg border border-border overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      {/* Image */}
+      <div className="relative aspect-square overflow-hidden bg-white">
         <img
           src={product.images[0]}
           alt={product.name}
-          className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
         />
-        {product.isBestSeller && (
-          <span className="absolute top-3 left-3 px-2 py-1 bg-accent text-accent-foreground text-xs font-semibold rounded-md">
-            Mais Vendido
-          </span>
-        )}
-      </Link>
+        {/* Badges */}
+        <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {discount > 0 && (
+            <span className="bg-destructive text-destructive-foreground text-[10px] font-bold px-2 py-0.5 rounded">
+              -{discount}%
+            </span>
+          )}
+          {product.isBestSeller && (
+            <span className="bg-accent text-accent-foreground text-[10px] font-bold px-2 py-0.5 rounded">
+              Mais vendido
+            </span>
+          )}
+        </div>
+        {/* Quick add */}
+        <button
+          onClick={handleAddToCart}
+          className="absolute bottom-2 right-2 w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:bg-primary/90 shadow-md"
+        >
+          <ShoppingCart className="h-4 w-4" />
+        </button>
+      </div>
 
       {/* Content */}
-      <div className="p-4 text-center">
-        <Link to={`/produto/${product.slug}`}>
-          <h3 className="font-semibold text-foreground hover:text-primary transition-colors line-clamp-2 min-h-[3rem]">
-            {product.name}
-          </h3>
-        </Link>
+      <div className="p-3 md:p-4 space-y-2">
+        <h3 className="text-sm font-medium text-foreground line-clamp-2 leading-snug min-h-[2.5rem] group-hover:text-primary transition-colors">
+          {product.name}
+        </h3>
 
-        {/* Price */}
-        <div className="mt-3">
-          <p className="text-xl font-bold text-primary">
+        <div className="space-y-0.5">
+          {product.originalPrice && (
+            <p className="text-xs text-muted-foreground line-through">
+              {formatPrice(product.originalPrice)}
+            </p>
+          )}
+          <p className="text-lg font-bold text-foreground">
             {formatPrice(product.price)}
           </p>
-          <p className="text-sm text-accent mt-1">
-            Em até {product.installments}x com juros
+          <p className="text-[11px] text-muted-foreground">
+            ou {product.installments}x de {formatPrice(product.installmentPrice)}
           </p>
         </div>
 
-        {/* Actions */}
-        <div className="mt-4 flex flex-col gap-2">
-          <Button variant="default" size="sm" className="w-full" onClick={handleAddToCart}>
-            <ShoppingCart className="h-3.5 w-3.5" />
-            ADICIONAR AO CARRINHO
-          </Button>
-          <Button variant="success" size="sm" className="w-full" asChild>
-            <Link to={`/produto/${product.slug}`}>
-              <Eye className="h-3.5 w-3.5" />
-              VER DETALHES
-            </Link>
-          </Button>
-        </div>
+        <Button
+          variant="default"
+          size="sm"
+          className="w-full rounded-full text-xs mt-2"
+          onClick={handleAddToCart}
+        >
+          <ShoppingCart className="h-3.5 w-3.5" />
+          Comprar
+        </Button>
       </div>
-    </div>
+    </Link>
   );
 }

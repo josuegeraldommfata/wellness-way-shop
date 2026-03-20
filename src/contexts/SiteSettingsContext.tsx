@@ -92,12 +92,12 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
         for (const [key, value] of Object.entries(data)) {
           if (key === "navbarLinks") {
             try {
-              (merged as Record<string, unknown>)[key] = typeof value === "string" ? JSON.parse(value as string) : value;
+              (merged as unknown as Record<string, unknown>)[key] = typeof value === "string" ? JSON.parse(value as string) : value;
             } catch {
               // Keep default
             }
           } else if (key in merged) {
-            (merged as Record<string, unknown>)[key] = value;
+            (merged as unknown as Record<string, unknown>)[key] = value;
           }
         }
         setSettings(merged);

@@ -9,12 +9,13 @@ export interface User {
   role: "customer" | "admin";
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (name: string, email: string, password: string, phone?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 

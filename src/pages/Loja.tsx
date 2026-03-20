@@ -4,13 +4,13 @@ import { Layout } from "@/components/layout/Layout";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, X } from "lucide-react";
+import { Search, SlidersHorizontal, X } from "lucide-react";
 import { useStoreData } from "@/contexts/StoreDataContext";
 
 const Loja = () => {
   const { products, categories, loadingProducts } = useStoreData();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("busca") || "");
   const [showFilters, setShowFilters] = useState(false);
 
   const selectedCategory = searchParams.get("categoria") || "";
@@ -43,8 +43,8 @@ const Loja = () => {
       <Layout>
         <div className="min-h-[50vh] flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p>Carregando produtos...</p>
+            <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent mx-auto mb-4"></div>
+            <p className="text-sm text-muted-foreground">Carregando produtos...</p>
           </div>
         </div>
       </Layout>
@@ -53,49 +53,50 @@ const Loja = () => {
 
   return (
     <Layout>
-      <div className="bg-muted py-8">
-        <div className="container-custom">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-            Nossa Loja
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Encontre os melhores produtos para sua saude
-          </p>
-        </div>
-      </div>
+      <div className="container-custom py-6">
+        {/* Breadcrumb */}
+        <p className="text-xs text-muted-foreground mb-4">
+          Início / <span className="text-foreground">Loja</span>
+        </p>
 
-      <div className="container-custom py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Filters sidebar - Desktop */}
-          <aside className="hidden lg:block w-64 shrink-0">
-            <div className="sticky top-32">
-              <h2 className="text-lg font-semibold mb-4">Categorias</h2>
-              <div className="space-y-2">
-                <Button
-                  variant={selectedCategory === "" ? "default" : "ghost"}
-                  className="w-full justify-start"
-                  onClick={() => handleCategoryChange("")}
-                >
-                  Todos os produtos
-                </Button>
-                {categories.map((category) => (
-                  <Button
-                    key={category.id}
-                    variant={selectedCategory === category.slug ? "default" : "ghost"}
-                    className="w-full justify-start"
-                    onClick={() => handleCategoryChange(category.slug)}
-                  >
-                    {category.name}
-                  </Button>
-                ))}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Sidebar - Desktop */}
+          <aside className="hidden lg:block w-56 shrink-0">
+            <div className="sticky top-40 space-y-6">
+              <div>
+                <h3 className="font-semibold text-sm text-foreground mb-3 uppercase tracking-wider">Categorias</h3>
+                <ul className="space-y-1">
+                  <li>
+                    <button
+                      onClick={() => handleCategoryChange("")}
+                      className={`block w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${
+                        selectedCategory === "" ? "bg-primary text-primary-foreground font-medium" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
+                    >
+                      Todos os produtos
+                    </button>
+                  </li>
+                  {categories.map((category) => (
+                    <li key={category.id}>
+                      <button
+                        onClick={() => handleCategoryChange(category.slug)}
+                        className={`block w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${
+                          selectedCategory === category.slug ? "bg-primary text-primary-foreground font-medium" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        }`}
+                      >
+                        {category.name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </aside>
 
           {/* Main content */}
-          <div className="flex-1">
-            {/* Search and filter bar */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          <div className="flex-1 min-w-0">
+            {/* Search + filter bar */}
+            <div className="flex gap-3 mb-6">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -103,70 +104,73 @@ const Loja = () => {
                   placeholder="Buscar produtos..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 rounded-full"
                 />
               </div>
               <Button
                 variant="outline"
-                className="lg:hidden"
+                size="icon"
+                className="lg:hidden shrink-0 rounded-full"
                 onClick={() => setShowFilters(!showFilters)}
               >
-                <Filter className="h-4 w-4 mr-2" />
-                Filtros
+                <SlidersHorizontal className="h-4 w-4" />
               </Button>
             </div>
 
             {/* Mobile filters */}
             {showFilters && (
-              <div className="lg:hidden mb-6 p-4 bg-muted rounded-lg">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-semibold">Categorias</h3>
-                  <Button variant="ghost" size="icon" onClick={() => setShowFilters(false)}>
-                    <X className="h-4 w-4" />
-                  </Button>
+              <div className="lg:hidden mb-4 p-4 bg-muted rounded-lg">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-semibold text-sm">Categorias</h3>
+                  <button onClick={() => setShowFilters(false)}>
+                    <X className="h-4 w-4 text-muted-foreground" />
+                  </button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant={selectedCategory === "" ? "default" : "secondary"}
-                    size="sm"
+                  <button
                     onClick={() => handleCategoryChange("")}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
+                      selectedCategory === "" ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border text-muted-foreground hover:border-primary"
+                    }`}
                   >
                     Todos
-                  </Button>
+                  </button>
                   {categories.map((category) => (
-                    <Button
+                    <button
                       key={category.id}
-                      variant={selectedCategory === category.slug ? "default" : "secondary"}
-                      size="sm"
                       onClick={() => handleCategoryChange(category.slug)}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
+                        selectedCategory === category.slug ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border text-muted-foreground hover:border-primary"
+                      }`}
                     >
                       {category.name}
-                    </Button>
+                    </button>
                   ))}
                 </div>
               </div>
             )}
 
             {/* Results count */}
-            <p className="text-muted-foreground mb-6">
-              Mostrando {filteredProducts.length} produto(s)
+            <p className="text-xs text-muted-foreground mb-4">
+              {filteredProducts.length} produto(s) encontrado(s)
             </p>
 
             {/* Products grid */}
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             ) : (
               <div className="text-center py-16">
-                <p className="text-muted-foreground">
-                  Nenhum produto encontrado para sua busca.
+                <p className="text-muted-foreground text-sm">
+                  Nenhum produto encontrado.
                 </p>
                 <Button
                   variant="outline"
-                  className="mt-4"
+                  size="sm"
+                  className="mt-4 rounded-full"
                   onClick={() => {
                     setSearchQuery("");
                     setSearchParams({});

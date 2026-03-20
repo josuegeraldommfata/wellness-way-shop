@@ -20,7 +20,7 @@ export function TestimonialsSection() {
             >
               <div className="flex gap-0.5">
                 {Array.from({ length: testimonial.rating }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <Star key={i} className="h-4 w-4 fill-accent text-accent" />
                 ))}
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">

@@ -159,7 +159,7 @@ export default function AdminAparencia() {
                   <ImageUpload
                     value={localSettings.faviconUrl}
                     onChange={(v) => handleChange("faviconUrl", v)}
-                    aspectRatio="1"
+                    aspectRatio="square"
                     placeholder="Envie o favicon do site (PNG/JPG, 32x32px recomendado)"
                   />
                 </div>
